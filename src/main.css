@@ -1,0 +1,48 @@
+:root {
+    --background-color: #3c3c3c;
+    --border-color: black;
+    --text-color: #cccccc;
+
+    --button-background-color: rgba(34, 33, 33, 0.418);
+    --button-background-color-hover: rgba(34, 33, 33, 0.815);
+    --button-text-color: #cccccc71;
+    --button-text-color-hover: #cccccc;
+
+
+    --font-size: 13px;
+    --border-width: 2px;
+}
+
+.chat-panel {
+    width: 100%;
+    min-height: 25px;
+    background-color: var(--background-color);
+    color: var(--text-color);
+    border: var(--border-width) solid var(--border-color);
+}
+
+body {
+    padding: 0;
+    margin: 0;
+}
+
+/* width */
+::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+    background: #888;
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+    background: #555;
+}
