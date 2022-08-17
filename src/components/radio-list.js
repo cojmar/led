@@ -9,9 +9,7 @@ window.customElements.define('radio-list', class extends HTMLElement {
 				</div>
             </template>
 			
-			<div class="list">
-				
-			</div> 
+			<div class="list"></div> 
             `
 	}
 	clear() {
