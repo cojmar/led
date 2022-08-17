@@ -1,7 +1,13 @@
 :root {
     --background-color: #3c3c3c;
-    --border-color: black;
+    --border-color: #3c3c3c;
     --text-color: #cccccc;
+
+    --checkbox-color:#1565c0;
+
+    --selected-color:#1565c01f;
+
+    --nav-color:#1565c0;
 
     --button-background-color: rgba(34, 33, 33, 0.418);
     --button-background-color-hover: rgba(34, 33, 33, 0.815);
@@ -13,36 +19,169 @@
     --border-width: 2px;
 }
 
-.chat-panel {
-    width: 100%;
-    min-height: 25px;
+html{
+    font-family: Roboto,sans-serif;
+}
+
+
+.list {
+    border: 1px solid var(--border-color);
+    float: left;
+    margin: 10px;
+    min-width: 30%;
+}
+
+.list-title {
+    font-weight: bold;
+    font-size: 14px;
     background-color: var(--background-color);
     color: var(--text-color);
-    border: var(--border-width) solid var(--border-color);
+    text-align: center;
+    padding: 5px;
 }
 
-body {
-    padding: 0;
-    margin: 0;
+.list-description {
+    user-select: none;
+    float: right;
+    text-align: right;
+    padding-right: 5px;
 }
 
-/* width */
-::-webkit-scrollbar {
-    width: 10px;
-    height: 10px;
+.list-item {
+    cursor: pointer;
+    user-select: none;
+    padding: 5px;
+    font-size: 16px;
+    border-bottom: 1px solid var(--border-color);
+    height: 22px;
+    line-height: 20px;
 }
 
-/* Track */
-::-webkit-scrollbar-track {
-    background: #f1f1f1;
+.list-checkbox {
+    border: 2px solid var(--border-color);
+    float: left;
+    order: solid 2px var(--border-color);
+    border-radius: 50%;
+    box-sizing: border-box;
+    display: block;
+    height: 20px;
+    margin: auto;
+    position: relative;
+    transition: 0.3s;
+    width: 20px;
+    margin-right: 5px;
+}
+.selected{
+    background-color: var(--selected-color);
 }
 
-/* Handle */
-::-webkit-scrollbar-thumb {
-    background: #888;
+.list-checkbox.selected::after {
+    background-color: var(--checkbox-color);
+    border-radius: 50%;
+    content: '';
+    height: 12px;
+    margin-left: 2px;
+    margin-top: 2px;
+    position: absolute;
+    animation: sheen ease 0.20s both;
+    /* transition: width,height 0.25s ease; */
+    width: 12px;
 }
 
-/* Handle on hover */
-::-webkit-scrollbar-thumb:hover {
-    background: #555;
+a.selected {
+    background-color: var(--background-color);
+    color: var(--button-text-color-hover);
+   
 }
+
+a.selected::before {
+    background-color: var(--checkbox-color);
+    border-radius: 50%;
+    content: '';
+    height: 12px;
+    margin-left: 2px;
+    margin-top: 2px;
+    position: absolute;
+    animation: sheen ease 0.20s both;
+    /* transition: width,height 0.25s ease; */
+    width: 12px;
+    left: 2px;
+}
+
+.page-title{
+    font-size: 26px;
+    margin-bottom: 20px;
+}
+
+input[type=text], select {
+    font-size: 20px;
+    width: 100%;
+    padding: 5px 5px;
+    margin: 8px 0;
+    display: inline-block;
+    border: 1px solid var(--border-color);    
+    box-sizing: border-box;
+  }
+  
+  input[type=submit] {
+    font-size: 20px;
+    width: 100%;
+    background-color: #4CAF50;
+    color: white;
+    padding: 14px 20px;
+    margin: 8px 0;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+  
+  input[type=submit]:hover {
+    background-color: #45a049;
+  }
+
+.page{
+    margin:20px;
+}
+
+
+a{
+    color: var(--button-text-color);
+    text-decoration: none;
+    margin-left: 15px;
+}
+
+.container {
+    position: fixed;
+    left: 150px;
+    top: 50px;
+    bottom: 0px;
+    right: 0px;
+}
+
+.top-menu{
+    position: fixed;
+    top: 0px;
+    left: 0px;
+    right: 0px;
+    height: 50px;
+    background-color: var(--nav-color);    
+    box-shadow: 0 2px 5px 0 rgba(0,0,0,.3);
+    z-index:3;
+}
+
+.menu{
+    position: fixed;
+    left: 0px;
+    top: 50px;
+    bottom: 0px;    
+    width: 150px;        
+    background-color: var(--background-color);    
+}
+
+.menu-item{
+    margin: 5px;
+    font-size: 14px;
+}
+
+
+

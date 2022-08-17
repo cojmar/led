@@ -1,5 +1,4 @@
 
-
 //component led-panel
 window.customElements.define('led-panel',
 	class extends HTMLElement {
@@ -321,25 +320,167 @@ window.customElements.define('led-tool-panel',
 	}
 )
 
+//component radio-list
+window.customElements.define('radio-list', class extends HTMLElement {
+	template() {
+		return `
+            <template class="list-item-template">
+				<div class="list-item">
+					<div class="list-checkbox"></div>
+					<span class="list-name"></span>
+					<span class="list-description"></span>
+				</div>
+            </template>
+			
+			<div class="list">
+				
+			</div> 
+            `
+	}
+	clear() {
+		this.index = false
+		this.items = []
+		this.render()
+	}
+	set_items(items) {
+		this.items = items
+		this.render()
+	}
+	hide() {
+		this.style.display = 'none'
+	}
+	show() {
+		this.style.display = 'block'
+	}
+	set_index(i) {
+		this.index = i
+		this.check_items.map((el, i) => {
+			if (i === this.index) el.classList.add('selected')
+			else el.classList.remove('selected')
+		})
+
+		this.list_items.map((el, i) => {
+			if (i === this.index) el.classList.add('selected')
+			else el.classList.remove('selected')
+		})
+		this.value = this.items[i]
+		this.dispatchEvent(new Event('change'))
+	}
+	render() {
+		this.list = this.list || this.querySelector('.list')
+		this.list.innerHTML = `<div class="list-title">${this.title}</div>`
+
+		this.items.map((data, i) => {
+			let item = this.item_template.cloneNode(true)
+
+			item.querySelector('.list-name').innerHTML = data.name || ''
+			item.querySelector('.list-description').innerHTML = data.description || ''
+			item.querySelector('.list-item').addEventListener('click', (e) => this.set_index(i))
+
+			this.list.appendChild(item)
+		})
+
+		this.list_items = Array.from(this.querySelectorAll('.list-item'))
+		this.check_items = Array.from(this.querySelectorAll('.list-checkbox'))
+
+	}
+	constructor() {
+		super()
+		this.title = this.innerHTML
+		this.innerHTML = this.template()
+		this.item_template = this.querySelector('.list-item-template').content
+		this.clear()
+	}
+
+})
+
 
 // main
 document.addEventListener('DOMContentLoaded', () => new class {
-    constructor() {
-        
-        this.init()
-    }
-
-    async init() {
-
-        this.main()
-    }
-
-    main() {
-
-        console.log('- start -')
+	constructor() {
+		this.dom = {
+			projects: document.querySelector('#projects'),
+			destinations: document.querySelector('#destinations'),
+			panels: document.querySelector('#panels')
+		}
+		this.main()
+	}
 
 
-    }
+	async get_data() {
+		return [{
+			name: "project 1",
+			description: "some desc",
+			items: [{
+					name: "dest 1",
+					description: "some desc dest1",
+					items: [{
+							name: "panel 1",
+							description: "some desc panel 1",
+						},
+						{
+							name: "panel 2",
+							description: "some desc panel 2",
+						}
+					]
+				},
+				{
+					name: "dest 2",
+					description: "some desc dest2",
+					items: [{
+							name: "panel 3",
+							description: "some desc panel 3",
+						},
+						{
+							name: "panel 4",
+							description: "some desc panel 4",
+						}
+					]
+				},
+
+				{
+					name: "dest 3",
+					description: "some desc dest3",
+				}
+
+			]
+		}, {
+			name: "project 2",
+			description: "some desc 2",
+			items: [
+
+			]
+		}, ]
+	}
+
+
+
+
+	async main() {
+		console.log('- start -')
+
+		this.dom.destinations.hide()
+		this.dom.panels.hide()
+
+		let data = await this.get_data()
+
+		this.dom.projects.set_items(data)
+		this.dom.projects.addEventListener('change', () => {
+			let items = this.dom.projects.value.items || []
+			this.dom.destinations.set_items(items)
+			this.dom.destinations.show()
+		})
+
+		this.dom.destinations.addEventListener('change', () => {
+			let items = this.dom.destinations.value.items || []
+			this.dom.panels.set_items(items)
+			this.dom.panels.show()
+		})
+
+
+
+		//this.projects.add_item('no way', 'bro')
+	}
 
 
 })

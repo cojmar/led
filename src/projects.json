@@ -1,0 +1,41 @@
+[{
+		"name": "project 1",
+		"description": "some desc",
+		"items": [{
+				"name": "dest 1",
+				"description": "some desc dest1",
+				"items": [{
+						"name": "panel 1",
+						"description": "some desc panel 1"
+					},
+					{
+						"name": "panel 2",
+						"description": "some desc panel 2"
+					}
+				]
+			},
+			{
+				"name": "dest 2",
+				"description": "some desc dest2",
+				"items": [{
+						"name": "panel 3",
+						"description": "some desc panel 3"
+					},
+					{
+						"name": "panel 4",
+						"description": "some desc panel 4"
+					}
+				]
+			},
+			{
+				"name": "dest 3",
+				"description": "some desc dest3"
+			}
+		]
+	},
+	{
+		"name": "project 2",
+		"description": "some desc 2",
+		"items": []
+	}
+]
