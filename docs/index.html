@@ -15,20 +15,66 @@
 </head>
 
 <body>
-	<div class="container">
-		<standard-panel id="projects">Projects</standard-panel>
-		<standard-panel id="destinations">Destinations</standard-panel>
-		<standard-panel id="panels">Panels</standard-panel>
+	<!-- project list -->
+	<template id="projects_list">
+		<radio-list id="projects">Projects</radio-list>
+		<radio-list id="destinations">Destinations</radio-list>
+		<radio-list id="panels">Panels</radio-list>
+	</template>
+
+	<!-- new project-->
+	<template id="new_project">
+		<div class="page">
+			<div class="page-title">Create project</div>
+			<div>
+				Name
+				<input type="text">
+			</div>
+			<div>
+				Description
+				<input type="text">
+			</div>
+			<div>				
+				<input type="submit" value="Save">
+			</div>
+		</div>
+
+	</template>
 
 
-		<br clear="all"><br>
 
+
+	<!-- edit panel -->
+	<template id="edit_panel">
 		<led-panel>
 			<led-tool-panel></led-tool-panel>
 		</led-panel>
+	</template>
 
+	<!-- top menu-->
+	<div class="top-menu">
+		<img src="img/thoreblogobranco.png" alt="" width="130px;" style="margin: 5px;">
+	</div>
+
+	<!-- left menu -->
+	<div class="menu">
+
+		<div class="menu-item">
+			<a href="#projects_list">Projects list</a>
+		</div>
+
+		<div class="menu-item">
+			<a href="#new_project">New project</a>
+		</div>
+
+		<div class="menu-item">
+			<a href="#edit_panel">Edit panel</a>
+		</div>
 
 	</div>
+
+	<!-- page -->
+	<div class="container"></div>
 </body>
 
 </html>

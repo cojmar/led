@@ -332,9 +332,7 @@ window.customElements.define('radio-list', class extends HTMLElement {
 				</div>
             </template>
 			
-			<div class="list">
-				
-			</div> 
+			<div class="list"></div> 
             `
 	}
 	clear() {
@@ -395,91 +393,81 @@ window.customElements.define('radio-list', class extends HTMLElement {
 })
 
 
-// main
+// main js
 document.addEventListener('DOMContentLoaded', () => new class {
 	constructor() {
-		this.dom = {
+		this.router()
+		window.addEventListener('hashchange', () => this.router(), false)
+	}
+
+	// router
+	router() {
+		let container = document.querySelector('.container')
+		container.innerHTML = ''
+
+		let routes = Object.getOwnPropertyNames(Object.getPrototypeOf(this)).reduce((r, i) => {
+			if (i.indexOf('page_') === 0) r.push(i)
+			return r
+		}, [])
+
+		let route = window.location.hash.substring(1) || routes[0].replace('page_', '')
+		let template = document.querySelector(`#${route}`)
+
+		let route_found = 0
+
+		if (template) {
+			let item = template.content.cloneNode(true)
+			container.appendChild(item)
+			route_found++
+		}
+		if (~routes.indexOf(`page_${route}`)) {
+			this[`page_${route}`]()
+			route_found++
+		}
+
+
+		Array.from(document.querySelectorAll('.menu-item > a')).map(a => {
+			if (a.getAttribute('href').substring(1) === route) a.classList.add('selected')
+			else a.classList.remove('selected')
+		})
+
+
+		// route not found
+		if (route_found === 0) container.innerHTML = '<center><b>Route not found!</b></center>'
+	}
+
+	// get projects
+	async get_projects() {
+		const response = await fetch('projects.json')
+		const projects = await response.json()
+		return projects
+	}
+
+	// pages
+	async page_projects_list() {
+		let data = await this.get_projects()
+
+		let dom = {
 			projects: document.querySelector('#projects'),
 			destinations: document.querySelector('#destinations'),
 			panels: document.querySelector('#panels')
 		}
-		this.main()
-	}
 
+		dom.destinations.hide()
+		dom.panels.hide()
 
-	async get_data() {
-		return [{
-			name: "project 1",
-			description: "some desc",
-			items: [{
-					name: "dest 1",
-					description: "some desc dest1",
-					items: [{
-							name: "panel 1",
-							description: "some desc panel 1",
-						},
-						{
-							name: "panel 2",
-							description: "some desc panel 2",
-						}
-					]
-				},
-				{
-					name: "dest 2",
-					description: "some desc dest2",
-					items: [{
-							name: "panel 3",
-							description: "some desc panel 3",
-						},
-						{
-							name: "panel 4",
-							description: "some desc panel 4",
-						}
-					]
-				},
-
-				{
-					name: "dest 3",
-					description: "some desc dest3",
-				}
-
-			]
-		}, {
-			name: "project 2",
-			description: "some desc 2",
-			items: [
-
-			]
-		}, ]
-	}
-
-
-
-
-	async main() {
-		console.log('- start -')
-
-		this.dom.destinations.hide()
-		this.dom.panels.hide()
-
-		let data = await this.get_data()
-
-		this.dom.projects.set_items(data)
-		this.dom.projects.addEventListener('change', () => {
-			let items = this.dom.projects.value.items || []
-			this.dom.destinations.set_items(items)
-			this.dom.destinations.show()
+		dom.projects.set_items(data)
+		dom.projects.addEventListener('change', () => {
+			let items = dom.projects.value.items || []
+			dom.destinations.set_items(items)
+			dom.destinations.show()
 		})
 
-		this.dom.destinations.addEventListener('change', () => {
-			let items = this.dom.destinations.value.items || []
-			this.dom.panels.set_items(items)
-			this.dom.panels.show()
+		dom.destinations.addEventListener('change', () => {
+			let items = dom.destinations.value.items || []
+			dom.panels.set_items(items)
+			dom.panels.show()
 		})
-
-
-
-		//this.projects.add_item('no way', 'bro')
 	}
 
 
