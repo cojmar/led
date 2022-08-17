@@ -64,6 +64,7 @@ document.addEventListener('DOMContentLoaded', () => new class {
 
 		dom.projects.set_items(data)
 		dom.projects.addEventListener('change', () => {
+			dom.panels.hide()
 			let items = dom.projects.value.items || []
 			dom.destinations.set_items(items)
 			dom.destinations.show()
