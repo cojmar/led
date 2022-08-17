@@ -61,6 +61,7 @@ window.customElements.define('radio-list', class extends HTMLElement {
 	}
 	constructor() {
 		super()
+		this.hide()
 		this.title = this.innerHTML
 		this.innerHTML = this.template()
 		this.item_template = this.querySelector('.list-item-template').content

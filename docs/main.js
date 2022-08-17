@@ -384,6 +384,7 @@ window.customElements.define('radio-list', class extends HTMLElement {
 	}
 	constructor() {
 		super()
+		this.hide()
 		this.title = this.innerHTML
 		this.innerHTML = this.template()
 		this.item_template = this.querySelector('.list-item-template').content
@@ -453,8 +454,7 @@ document.addEventListener('DOMContentLoaded', () => new class {
 			panels: document.querySelector('#panels')
 		}
 
-		dom.destinations.hide()
-		dom.panels.hide()
+		dom.projects.show()
 
 		dom.projects.set_items(data)
 		dom.projects.addEventListener('change', () => {

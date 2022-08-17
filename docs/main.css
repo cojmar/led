@@ -36,7 +36,7 @@ html{
     font-size: 14px;
     background-color: var(--background-color);
     color: var(--text-color);
-    text-align: center;
+    /* text-align: center; */
     padding: 5px;
 }
 
@@ -88,10 +88,18 @@ html{
     width: 12px;
 }
 
+.icon{
+    width: 20px;
+    margin: 0px;
+}
+
 a.selected {
     background-color: var(--background-color);
-    color: var(--button-text-color-hover);
-   
+    color: var(--button-text-color-hover);   
+}
+
+a:hover{
+    color: var(--button-text-color-hover);  
 }
 
 a.selected::before {

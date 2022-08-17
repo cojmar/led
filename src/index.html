@@ -17,9 +17,24 @@
 <body>
 	<!-- project list -->
 	<template id="projects_list">
-		<radio-list id="projects">Projects</radio-list>
-		<radio-list id="destinations">Destinations</radio-list>
-		<radio-list id="panels">Panels</radio-list>
+		<radio-list id="projects">
+			<span>Projects</span>
+			<span style="float:right;margin-top:-2px;">				
+				<a class="icon" href="#new_project" title="Duplicate project">♻️</a>
+				<a class="icon" href="#new_project" title="Edit project">✏️</a>
+				<a class="icon" href="#new_project" title="New project">➕</a>
+			</span> 
+		</radio-list>
+		<radio-list id="destinations">			
+			<span>Destinations</span>
+			<span style="float:right;margin-top:-2px;">								
+				<a class="icon" href="#new_project" title="Edit destination">✏️</a>
+				<a class="icon" href="#new_project" title="New destination">➕</a>
+			</span> 
+		</radio-list>
+		<radio-list id="panels">
+			Panels
+		</radio-list>
 	</template>
 
 	<!-- new project-->
@@ -40,6 +55,11 @@
 		</div>
 
 	</template>
+
+	<template id="test">
+		test	
+	</template>
+
 
 
 
