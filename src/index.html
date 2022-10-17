@@ -1,102 +1,218 @@
-<!DOCTYPE html>
-<html lang="en">
+import './components.js'
 
-<head>
-	<meta charset="UTF-8">
-	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title>Document</title>
-	<link rel="stylesheet" href="main.css">
-	<script type="module" src="./main.js"></script>
-	<style>
+// main js
+document.addEventListener('DOMContentLoaded', () => new class {
+	constructor() {
+		this.router()
+		window.addEventListener('hashchange', () => this.router(), false)
+	}
 
-	</style>
+	// router
+	router() {
+		let container = document.querySelector('.container')
+		container.innerHTML = ''
 
-</head>
+		let url_data = window.location.hash.substring(1) || 'projects_list'
+		url_data = url_data.split('/')
 
-<body>
-	<!-- project list -->
-	<template id="projects_list">
-		<radio-list id="projects">
-			<span>Projects</span>
-			<span style="float:right;margin-top:-2px;">				
-				<a class="icon" href="#new_project" title="Duplicate project">♻️</a>
-				<a class="icon" href="#new_project" title="Edit project">✏️</a>
-				<a class="icon" href="#new_project" title="New project">➕</a>
-			</span> 
-		</radio-list>
-		<radio-list id="destinations">			
-			<span>Destinations</span>
-			<span style="float:right;margin-top:-2px;">								
-				<a class="icon" href="#new_project" title="Edit destination">✏️</a>
-				<a class="icon" href="#new_project" title="New destination">➕</a>
-			</span> 
-		</radio-list>
-		<radio-list id="panels">
-			Panels
-		</radio-list>
-	</template>
-
-	<!-- new project-->
-	<template id="new_project">
-		<div class="page">
-			<form>
-				<div class="page-title">Create project</div>
-				<div>
-					Name
-					<input type="text">
-				</div>
-				<div>
-					Description
-					<input type="text">
-				</div>
-				<div>				
-					<input type="submit" value="Save">
-				</div>
-			</form>
-		</div>
-
-	</template>
-
-	<template id="test">
-		<new-form data='{"title":"New project","fields":["name","description"]}'></new-form>
-	</template>
+		let route = url_data.shift()
 
 
 
+		let template = document.querySelector(`#${route}`)
+
+		let route_found = 0
+
+		if (template) {
+			let item = template.content.cloneNode(true)
+			container.appendChild(item)
+			route_found++
+		}
+		if (typeof this[`page_${route}`] === 'function') {
+			this[`page_${route}`](...url_data)
+			route_found++
+		}
+
+		Array.from(document.querySelectorAll('.menu-item > a')).map(a => {
+			if (a.getAttribute('href').substring(1) === route) a.classList.add('selected')
+			else a.classList.remove('selected')
+		})
+
+		// route not found
+		if (route_found === 0) container.innerHTML = '<center><b>Route not found!</b></center>'
+	}
+
+	async server(route, data = false) {
+		let url = `server/?route=${route}`
+		let opts = { cache: "no-store" }
+		opts = (typeof data === 'object') ? { cache: "no-store", method: 'post', body: JSON.stringify(data) } : opts
+
+		const response = await fetch(url, opts)
+		return await response.json()
+	}
+
+	save_form(url, cb) {
+		document.querySelector('new-form').onsubmit(async(data) => {
+			let r = await this.server(url, data)
+			if (typeof cb === 'function') cb(r)
+		})
+	}
+
+	// pages
+	async page_projects_list() {
+		let data = await this.server('projects_list')
+
+		let dom = {
+			projects: document.querySelector('#projects'),
+			destinations: document.querySelector('#destinations'),
+			panels: document.querySelector('#panels'),
+		}
+
+		dom.projects.show()
+
+		dom.projects.set_items(data)
+		dom.projects.addEventListener('change', () => {
+			dom.panels.hide()
+			let items = dom.projects.value.destinations || []
+			dom.destinations.set_items(items)
+			dom.destinations.show()
+
+			dom.projects.querySelector('#edit_button').onclick = (e) => {
+				e.preventDefault()
+				if (!dom.projects.value) return false
+				window.location.href = `#edit_project/${dom.projects.value.id}`
+			}
+
+			dom.destinations.querySelector('#new_button').onclick = (e) => {
+				e.preventDefault()
+				if (!dom.projects.value) return false
+				window.location.href = `#new_destination/${dom.projects.value.id}`
+			}
+
+		})
+
+		dom.destinations.addEventListener('change', () => {
+			let items = dom.projects.value.panels || []
+			dom.panels.set_items(items)
+			dom.panels.show()
+
+			dom.destinations.querySelector('#edit_button').onclick = (e) => {
+				e.preventDefault()
+				if (!dom.destinations.value) return false
+				window.location.href = `#edit_destination/${dom.destinations.value.id}`
+			}
+		})
+	}
 
 
-	<!-- edit panel -->
-	<template id="edit_panel">
-		<led-panel>
-			<led-tool-panel></led-tool-panel>
-		</led-panel>
-	</template>
+	async page_new_project() {
+		this.save_form('save_project', (r) => {
+			if (r.error) console.log(r.error)
+			else window.location.href = '#'
+		})
+	}
 
-	<!-- top menu-->
-	<div class="top-menu">
-		<img src="img/thoreblogobranco.png" alt="" width="130px;" style="margin: 5px;">
-	</div>
+	async page_edit_project(id) {
+		if (!id) {
+			window.location.href = '#'
+			return
+		}
 
-	<!-- left menu -->
-	<div class="menu">
+		let data = await this.server('projects_list')
+		let project = data.find((v) => v.id === id);
 
-		<div class="menu-item">
-			<a href="#projects_list">Projects list</a>
-		</div>
+		if (!project) {
+			window.location.href = '#'
+			return
+		}
 
-		<div class="menu-item">
-			<a href="#new_project">New project</a>
-		</div>
+		let form = document.querySelector('new-form')
+		form.querySelector('.page-title').innerHTML = `Edit project ${project.id}`
+		form.set_data(project)
 
-		<div class="menu-item">
-			<a href="#edit_panel">Edit panel</a>
-		</div>
+		this.save_form('save_project', (r) => {
+			if (r.error) console.log(r.error)
+			else window.location.href = '#'
+		})
+	}
 
-	</div>
+	async page_new_destination(project_id) {
+		if (!project_id) {
+			window.location.href = '#'
+			return
+		}
 
-	<!-- page -->
-	<div class="container"></div>
-</body>
+		let data = await this.server('projects_list')
+		let project = data.find((v) => v.id === project_id);
 
-</html>
+
+		if (!project) {
+			window.location.href = '#'
+			return
+		}
+
+		let project_index = data.findIndex((v) => v.id === project_id)
+
+		let form = document.querySelector('new-form')
+		form.set_data({ project_id: project_id })
+
+		this.save_form('save_destination', (r) => {
+			if (r.error) console.log(r.error)
+			else {
+				window.location.href = '#'
+				setTimeout(() => {
+					document.querySelector('#projects').set_index(project_index)
+					setTimeout(() => {
+						document.querySelector('#destinations').set_index(project.destinations.length)
+					}, 100)
+				}, 100)
+			}
+		})
+	}
+
+	async page_edit_destination(id) {
+		if (!id) {
+			window.location.href = '#'
+			return
+		}
+
+		let data = await this.server('projects_list')
+		let project = data.find((v) => v.destinations.find((v) => v.id === id))
+
+		if (!project) {
+			window.location.href = '#'
+			return
+		}
+
+
+		let destination = project.destinations.find((v) => v.id === id)
+		let destination_index = project.destinations.findIndex((v) => v.id === id)
+
+		let project_index = data.findIndex((v) => v.id === destination.project_id)
+
+		if (!destination) {
+			window.location.href = '#'
+			return
+		}
+
+		let form = document.querySelector('new-form')
+		form.set_data(destination)
+
+		this.save_form('save_destination', (r) => {
+			if (r.error) console.log(r.error)
+			else {
+				window.location.href = '#'
+				setTimeout(() => {
+					document.querySelector('#projects').set_index(project_index)
+					setTimeout(() => {
+						document.querySelector('#destinations').set_index(destination_index)
+					}, 100)
+				}, 100)
+			}
+		})
+
+	}
+
+
+
+})
