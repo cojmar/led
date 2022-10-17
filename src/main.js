@@ -36,17 +36,18 @@ document.addEventListener('DOMContentLoaded', () => new class {
 		if (route_found === 0) container.innerHTML = '<center><b>Route not found!</b></center>'
 	}
 
-	// get projects
-	async get_projects() {
-		const response = await fetch('projects.json')
-		const projects = await response.json()
-		return projects
+	async server(route, data = false) {
+		let url = `server/?route=${route}`
+		let opts = { cache: "no-store" }
+		opts = (typeof data === 'object') ? { cache: "no-store", method: 'post', body: JSON.stringify(data) } : opts
+
+		const response = await fetch(url, opts)
+		return await response.json()
 	}
 
 	// pages
 	async page_projects_list() {
-
-		let data = await this.get_projects()
+		let data = await this.server('projects_list')
 
 		let dom = {
 			projects: document.querySelector('#projects'),
@@ -59,13 +60,13 @@ document.addEventListener('DOMContentLoaded', () => new class {
 		dom.projects.set_items(data)
 		dom.projects.addEventListener('change', () => {
 			dom.panels.hide()
-			let items = dom.projects.value.items || []
+			let items = dom.projects.value.destinations || []
 			dom.destinations.set_items(items)
 			dom.destinations.show()
 		})
 
 		dom.destinations.addEventListener('change', () => {
-			let items = dom.destinations.value.items || []
+			let items = dom.projects.value.panels || []
 			dom.panels.set_items(items)
 			dom.panels.show()
 		})
