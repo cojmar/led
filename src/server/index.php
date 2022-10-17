@@ -12,7 +12,19 @@ class router
 
     function save_project()
     {
+        $validate = array("name");
+        foreach ($validate as $field) if (empty($this->post_data[$field])) json_output(array("error" => "missing field $field"));
+
         $out = $this->led_model->add_edit_project($this->post_data);
+        json_output($out);
+    }
+
+    function save_destination()
+    {
+        $validate = array("name", "project_id");
+        foreach ($validate as $field) if (empty($this->post_data[$field])) json_output(array("error" => "missing field $field"));
+
+        $out = $this->led_model->add_edit_destination($this->post_data);
         json_output($out);
     }
 
@@ -21,7 +33,7 @@ class router
     {
 
         try {
-            $this->post_data = json_decode(file_get_contents('php://input'));
+            $this->post_data = json_decode(file_get_contents('php://input'), 1);
         } catch (\Throwable $th) {
             $this->post_data = array();
         }

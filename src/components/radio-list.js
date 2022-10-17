@@ -43,7 +43,7 @@ window.customElements.define('radio-list', class extends HTMLElement {
 	}
 	render() {
 		this.list = this.list || this.querySelector('.list')
-		this.list.innerHTML = `<div class="list-title">${this.title}</div>`
+		this.list.innerHTML = `<div class="list-title">${this.my_title}</div>`
 
 		this.items.map((data, i) => {
 			let item = this.item_template.cloneNode(true)
@@ -62,7 +62,7 @@ window.customElements.define('radio-list', class extends HTMLElement {
 	constructor() {
 		super()
 		this.hide()
-		this.title = this.innerHTML
+		this.my_title = this.innerHTML
 		this.innerHTML = this.template()
 		this.item_template = this.querySelector('.list-item-template').content
 		this.clear()

@@ -9,6 +9,13 @@ window.customElements.define('new-form', class extends HTMLElement {
 		if (typeof f === 'function') this.on_sub_f.push(f)
 	}
 
+	set_data(data) {
+		Object.keys(data).map(key => {
+			let el = this.querySelector(`#el_${key}`)
+			if (el) el.value = data[key]
+		})
+	}
+
 	constructor() {
 		super()
 		this.on_sub_f = []
@@ -21,14 +28,20 @@ window.customElements.define('new-form', class extends HTMLElement {
 
 		let title = data.title || ''
 
+		let hidden_fields = data.hidden_fields || []
+
 		let fields = ''
 		if (data.fields) data.fields.map(field => {
-			fields += `
+			if (~hidden_fields.indexOf(field)) {
+				fields += `<input type="hidden" name="${field}" id="el_${field}">`
+			} else {
+				fields += `
                 <div>
                     ${this.capitalizeFirstLetter(field)}
-                    <input type="text" name="${field}">
+                    <input type="text" name="${field}" id="el_${field}">
                 </div>
             `
+			}
 		})
 
 		this.innerHTML = `
