@@ -98,7 +98,7 @@ class led_model
         if (empty($panel_id)) return false;
         $sqls = array();
         $sqls[] = "delete from led_panels_data where panel_id = $panel_id";
-        $sqls[] = "delete from led_panels where panel_id = $panel_id";
+        $sqls[] = "delete from led_panels where id = $panel_id";
 
         foreach ($sqls as $sql)
             $this->db->query($sql);

@@ -55,6 +55,15 @@ class router
         json_output($out);
     }
 
+    function del_panel()
+    {
+        $validate = array("id");
+        foreach ($validate as $field) if (empty($this->post_data[$field])) json_output(array("error" => "missing field $field"));
+
+        $out = $this->led_model->delete_panel($this->post_data['id']);
+        json_output($out);
+    }
+
 
     //==Init
     private function init()

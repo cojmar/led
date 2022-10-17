@@ -159,6 +159,28 @@ document.addEventListener('DOMContentLoaded', () => new class {
 				if (!dom.panels.value) return false
 				window.location.href = `#edit_panel/${dom.panels.value.id}`
 			}
+
+			dom.panels.querySelector('#del_button').onclick = async(e) => {
+				e.preventDefault()
+				if (!dom.panels.value) return false
+				if (confirm("Delete selected panel ?")) {
+					let server_call = await this.server('del_panel', { id: dom.panels.value.id })
+					if (server_call.error) {
+						this.log(server_call.error)
+					} else {
+						let index = dom.projects.index
+						let dest_index = dom.destinations.index
+						this.router()
+						setTimeout(() => {
+							document.querySelector('#projects').set_index(index)
+							setTimeout(() => {
+								document.querySelector('#destinations').set_index(dest_index)
+							}, 100)
+						}, 100)
+					}
+				}
+			}
+
 		})
 	}
 
