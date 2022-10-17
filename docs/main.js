@@ -320,6 +320,32 @@ window.customElements.define('led-tool-panel',
 	}
 )
 
+//component new-form
+window.customElements.define('new-form', class extends HTMLElement {
+	template() {
+		return `
+            <template class="list-item-template">
+				<div class="list-item">
+					<div class="list-checkbox"></div>
+					<span class="list-name"></span>
+					<span class="list-description"></span>
+				</div>
+            </template>
+			
+			<div class="list"></div> 
+            opa
+            `
+	}
+
+	constructor() {
+
+		this.title = this.innerHTML
+		this.innerHTML = this.template()
+
+	}
+
+})
+
 //component radio-list
 window.customElements.define('radio-list', class extends HTMLElement {
 	template() {
@@ -406,12 +432,7 @@ document.addEventListener('DOMContentLoaded', () => new class {
 		let container = document.querySelector('.container')
 		container.innerHTML = ''
 
-		let routes = Object.getOwnPropertyNames(Object.getPrototypeOf(this)).reduce((r, i) => {
-			if (i.indexOf('page_') === 0) r.push(i)
-			return r
-		}, [])
-
-		let route = window.location.hash.substring(1) || routes[0].replace('page_', '')
+		let route = window.location.hash.substring(1) || 'projects_list'
 		let template = document.querySelector(`#${route}`)
 
 		let route_found = 0
@@ -421,32 +442,32 @@ document.addEventListener('DOMContentLoaded', () => new class {
 			container.appendChild(item)
 			route_found++
 		}
-		if (~routes.indexOf(`page_${route}`)) {
+		if (typeof this[`page_${route}`] === 'function') {
 			this[`page_${route}`]()
 			route_found++
 		}
-
 
 		Array.from(document.querySelectorAll('.menu-item > a')).map(a => {
 			if (a.getAttribute('href').substring(1) === route) a.classList.add('selected')
 			else a.classList.remove('selected')
 		})
 
-
 		// route not found
 		if (route_found === 0) container.innerHTML = '<center><b>Route not found!</b></center>'
 	}
 
-	// get projects
-	async get_projects() {
-		const response = await fetch('projects.json')
-		const projects = await response.json()
-		return projects
+	async server(route, data = false) {
+		let url = `server/?route=${route}`
+		let opts = { cache: "no-store" }
+		opts = (typeof data === 'object') ? { cache: "no-store", method: 'post', body: JSON.stringify(data) } : opts
+
+		const response = await fetch(url, opts)
+		return await response.json()
 	}
 
 	// pages
 	async page_projects_list() {
-		let data = await this.get_projects()
+		let data = await this.server('projects_list')
 
 		let dom = {
 			projects: document.querySelector('#projects'),
@@ -458,16 +479,21 @@ document.addEventListener('DOMContentLoaded', () => new class {
 
 		dom.projects.set_items(data)
 		dom.projects.addEventListener('change', () => {
-			let items = dom.projects.value.items || []
+			dom.panels.hide()
+			let items = dom.projects.value.destinations || []
 			dom.destinations.set_items(items)
 			dom.destinations.show()
 		})
 
 		dom.destinations.addEventListener('change', () => {
-			let items = dom.destinations.value.items || []
+			let items = dom.projects.value.panels || []
 			dom.panels.set_items(items)
 			dom.panels.show()
 		})
+	}
+
+	async page_new_project() {
+		console.log('a')
 	}
 
 

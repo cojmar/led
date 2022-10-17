@@ -72,5 +72,19 @@ document.addEventListener('DOMContentLoaded', () => new class {
 		})
 	}
 
+	save_form(url, cb) {
+		document.querySelector('new-form').onsubmit(async(data) => {
+			let r = await this.server(url, data)
+			if (typeof cb === 'function') cb(r)
+		})
+	}
+
+	async page_test() {
+		this.save_form('save_project', (r) => {
+			console.log(r)
+		})
+
+	}
+
 
 })

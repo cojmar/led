@@ -40,24 +40,26 @@
 	<!-- new project-->
 	<template id="new_project">
 		<div class="page">
-			<div class="page-title">Create project</div>
-			<div>
-				Name
-				<input type="text">
-			</div>
-			<div>
-				Description
-				<input type="text">
-			</div>
-			<div>				
-				<input type="submit" value="Save">
-			</div>
+			<form>
+				<div class="page-title">Create project</div>
+				<div>
+					Name
+					<input type="text">
+				</div>
+				<div>
+					Description
+					<input type="text">
+				</div>
+				<div>				
+					<input type="submit" value="Save">
+				</div>
+			</form>
 		</div>
 
 	</template>
 
 	<template id="test">
-		test	
+		<new-form data='{"title":"New project","fields":["name","description"]}'></new-form>
 	</template>
 
 

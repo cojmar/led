@@ -6,28 +6,17 @@ class router
 
     function projects_list()
     {
-        $out = $this->led_model->projects_list();
+        $out = $this->server_model->projects_list();
         json_output($out);
     }
 
-    function save_project()
-    {
-        $out = $this->led_model->add_edit_project($this->post_data);
-        json_output($out);
-    }
 
-    //==Init
+
+    //==Custom Init
     private function init()
     {
-
-        try {
-            $this->post_data = json_decode(file_get_contents('php://input'));
-        } catch (\Throwable $th) {
-            $this->post_data = array();
-        }
-
         $this->db = new db_class();
-        $this->led_model = new led_model();
+        $this->server_model = new server_model();
         $this->db->connect("localhost", "root", "asdasd", "led_panel");
     }
 
