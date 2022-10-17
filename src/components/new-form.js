@@ -46,7 +46,7 @@ window.customElements.define('new-form', class extends HTMLElement {
 
 		this.innerHTML = `
         <div class="page">
-            <form>
+            <form autocomplete="off">
                 <div class="page-title">${title}</div>
                 ${fields}
                 <div>				

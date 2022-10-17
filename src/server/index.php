@@ -19,6 +19,15 @@ class router
         json_output($out);
     }
 
+    function del_project()
+    {
+        $validate = array("id");
+        foreach ($validate as $field) if (empty($this->post_data[$field])) json_output(array("error" => "missing field $field"));
+
+        $out = $this->led_model->delete_project($this->post_data['id']);
+        json_output($out);
+    }
+
     function save_destination()
     {
         $validate = array("name", "project_id");
@@ -27,6 +36,25 @@ class router
         $out = $this->led_model->add_edit_destination($this->post_data);
         json_output($out);
     }
+
+    function del_destination()
+    {
+        $validate = array("id");
+        foreach ($validate as $field) if (empty($this->post_data[$field])) json_output(array("error" => "missing field $field"));
+
+        $out = $this->led_model->delete_destination($this->post_data['id']);
+        json_output($out);
+    }
+
+    function save_panel()
+    {
+        $validate = array("name", "project_id");
+        foreach ($validate as $field) if (empty($this->post_data[$field])) json_output(array("error" => "missing field $field"));
+
+        $out = $this->led_model->add_edit_panel($this->post_data);
+        json_output($out);
+    }
+
 
     //==Init
     private function init()

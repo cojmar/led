@@ -46,9 +46,15 @@ document.addEventListener('DOMContentLoaded', () => new class {
 		let url = `server/?route=${route}`
 		let opts = { cache: "no-store" }
 		opts = (typeof data === 'object') ? { cache: "no-store", method: 'post', body: JSON.stringify(data) } : opts
-
 		const response = await fetch(url, opts)
-		return await response.json()
+		let r = await response.text()
+		let ret
+		try {
+			ret = JSON.parse(r)
+		} catch (error) {
+			ret = { error: r }
+		}
+		return ret
 	}
 
 	save_form(url, cb) {
@@ -56,6 +62,10 @@ document.addEventListener('DOMContentLoaded', () => new class {
 			let r = await this.server(url, data)
 			if (typeof cb === 'function') cb(r)
 		})
+	}
+
+	log(data) {
+		console.log(data)
 	}
 
 	// pages
@@ -83,6 +93,20 @@ document.addEventListener('DOMContentLoaded', () => new class {
 				window.location.href = `#edit_project/${dom.projects.value.id}`
 			}
 
+			dom.projects.querySelector('#del_button').onclick = async(e) => {
+				e.preventDefault()
+				if (!dom.projects.value) return false
+				if (confirm("Delete selected project ?")) {
+					let server_call = await this.server('del_project', { id: dom.projects.value.id })
+					if (server_call.error) {
+						this.log(server_call.error)
+					} else {
+						this.router()
+					}
+				}
+
+			}
+
 			dom.destinations.querySelector('#new_button').onclick = (e) => {
 				e.preventDefault()
 				if (!dom.projects.value) return false
@@ -101,14 +125,51 @@ document.addEventListener('DOMContentLoaded', () => new class {
 				if (!dom.destinations.value) return false
 				window.location.href = `#edit_destination/${dom.destinations.value.id}`
 			}
+
+			dom.destinations.querySelector('#del_button').onclick = async(e) => {
+				e.preventDefault()
+				if (!dom.projects.value) return false
+				if (confirm("Delete selected destination ?")) {
+					let server_call = await this.server('del_destination', { id: dom.destinations.value.id })
+					if (server_call.error) {
+						this.log(server_call.error)
+					} else {
+						let index = dom.projects.index
+						this.router()
+						setTimeout(() => {
+							document.querySelector('#projects').set_index(index)
+						}, 100)
+					}
+				}
+			}
+
+			dom.panels.querySelector('#new_button').onclick = (e) => {
+				e.preventDefault()
+				if (!dom.projects.value) return false
+				window.location.href = `#new_panel/${dom.projects.value.id}/${dom.destinations.index}`
+			}
+
+
+		})
+
+
+		dom.panels.addEventListener('change', () => {
+			dom.panels.querySelector('#edit_button').onclick = (e) => {
+				e.preventDefault()
+				if (!dom.panels.value) return false
+				window.location.href = `#edit_panel/${dom.panels.value.id}`
+			}
 		})
 	}
 
 
 	async page_new_project() {
 		this.save_form('save_project', (r) => {
-			if (r.error) console.log(r.error)
-			else window.location.href = '#'
+			if (r.error) this.log(r.error)
+			else {
+				this.log('save done');
+				window.location.href = '#'
+			}
 		})
 	}
 
@@ -131,8 +192,11 @@ document.addEventListener('DOMContentLoaded', () => new class {
 		form.set_data(project)
 
 		this.save_form('save_project', (r) => {
-			if (r.error) console.log(r.error)
-			else window.location.href = '#'
+			if (r.error) this.log(r.error)
+			else {
+				this.log('save done');
+				window.location.href = '#'
+			}
 		})
 	}
 
@@ -157,8 +221,9 @@ document.addEventListener('DOMContentLoaded', () => new class {
 		form.set_data({ project_id: project_id })
 
 		this.save_form('save_destination', (r) => {
-			if (r.error) console.log(r.error)
+			if (r.error) this.log(r.error)
 			else {
+				this.log('save done');
 				window.location.href = '#'
 				setTimeout(() => {
 					document.querySelector('#projects').set_index(project_index)
@@ -196,17 +261,109 @@ document.addEventListener('DOMContentLoaded', () => new class {
 		}
 
 		let form = document.querySelector('new-form')
+		form.querySelector('.page-title').innerHTML = `Edit destination ${id}`
 		form.set_data(destination)
 
 		this.save_form('save_destination', (r) => {
-			if (r.error) console.log(r.error)
+			if (r.error) this.log(r.error)
 			else {
+				this.log('save done');
 				window.location.href = '#'
 				setTimeout(() => {
 					document.querySelector('#projects').set_index(project_index)
 					setTimeout(() => {
 						document.querySelector('#destinations').set_index(destination_index)
 					}, 100)
+				}, 100)
+			}
+		})
+
+	}
+
+
+	async page_new_panel(project_id, destination_index) {
+		if (!project_id) {
+			window.location.href = '#'
+			return
+		}
+
+		destination_index *= 1
+
+		let data = await this.server('projects_list')
+		let project = data.find((v) => v.id === project_id);
+
+
+		if (!project) {
+			window.location.href = '#'
+			return
+		}
+
+		let project_index = data.findIndex((v) => v.id === project_id)
+
+
+		console.log(destination_index)
+		let form = document.querySelector('new-form')
+		form.set_data({ project_id: project_id })
+
+		this.save_form('save_panel', (r) => {
+			if (r.error) this.log(r.error)
+			else {
+				this.log('save done');
+				window.location.href = '#'
+				setTimeout(() => {
+					document.querySelector('#projects').set_index(project_index)
+					setTimeout(() => {
+						document.querySelector('#destinations').set_index(destination_index)
+					}, 200)
+
+				}, 100)
+			}
+		})
+	}
+
+	async page_edit_panel(id, destination_index) {
+		if (!id) {
+			window.location.href = '#'
+			return
+		}
+
+		destination_index *= 1
+
+		let data = await this.server('projects_list')
+		let project = data.find((v) => v.panels.find((v) => v.id === id))
+
+		if (!project) {
+			window.location.href = '#'
+			return
+		}
+
+
+		let panel = project.panels.find((v) => v.id === id)
+		let panel_index = project.panels.findIndex((v) => v.id === id)
+
+		let project_index = data.findIndex((v) => v.id === panel.project_id)
+
+		if (!panel) {
+			window.location.href = '#'
+			return
+		}
+
+		let form = document.querySelector('new-form')
+		form.querySelector('.page-title').innerHTML = `Edit panel ${id}`
+		form.set_data(panel)
+
+		this.save_form('save_panel', (r) => {
+			if (r.error) this.log(r.error)
+			else {
+				this.log('save done');
+				window.location.href = '#'
+				setTimeout(() => {
+					document.querySelector('#projects').set_index(project_index)
+						/*
+						setTimeout(() => {
+							document.querySelector('#destinations').set_index(destination_index)
+						}, 100)
+						*/
 				}, 100)
 			}
 		})

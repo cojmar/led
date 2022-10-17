@@ -35,7 +35,12 @@
 			</span> 
 		</radio-list>
 		<radio-list id="panels">
-			Panels
+			<span>Panels</span>
+			<span style="float:right;margin-top:-2px;">								
+				<a class="icon" href="#" title="Delete panel" id="del_button">🗑</a>
+				<a class="icon" href="#" title="Edit panel" id="edit_button">✏️</a>
+				<a class="icon" href="#" title="New panel" id="new_button">➕</a>
+			</span> 
 		</radio-list>
 	</template>
 
@@ -52,6 +57,11 @@
 	<!-- new destination-->
 	<template id="new_destination">
 		<new-form data='{"title":"New destination","fields":["name","description","project_id"],"hidden_fields":["project_id"]}'></new-form>
+	</template>
+
+	<!-- new panel-->
+	<template id="new_panel">
+		<new-form data='{"title":"New panel","fields":["name","description","project_id"],"hidden_fields":["project_id"]}'></new-form>
 	</template>
 
 	<!-- edit destination-->

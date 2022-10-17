@@ -55,10 +55,12 @@ class led_model
     {
         if (empty($project_id)) return false;
         $sqls = array();
-        $sqls[] = "delete from led_panels_data where destination_id in (select * from led_destinations where project_id=$project_id)";
+        $sqls[] = "delete from led_panels_data where destination_id in (select id from led_destinations where project_id=$project_id)";
         $sqls[] = "delete from led_destinations where project_id=$project_id";
         $sqls[] = "delete from led_panels where project_id=$project_id";
         $sqls[] = "delete from led_projects where id=$project_id";
+
+
 
         foreach ($sqls as $sql)
             $this->db->query($sql);
@@ -77,7 +79,7 @@ class led_model
         if (empty($destination_id)) return false;
         $sqls = array();
         $sqls[] = "delete from led_panels_data where destination_id = $destination_id";
-        $sqls[] = "delete from led_destinations where destination_id=$destination_id";
+        $sqls[] = "delete from led_destinations where id=$destination_id";
 
         foreach ($sqls as $sql)
             $this->db->query($sql);
