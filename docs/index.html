@@ -20,49 +20,58 @@
 		<radio-list id="projects">
 			<span>Projects</span>
 			<span style="float:right;margin-top:-2px;">				
-				<a class="icon" href="#new_project" title="Duplicate project">♻️</a>
-				<a class="icon" href="#new_project" title="Edit project">✏️</a>
+				<a class="icon" href="#" title="Delete project" id="del_button">🗑</a>				
+				<a class="icon" href="#" title="Duplicate project">♻️</a>
+				<a class="icon" href="#" title="Edit project" id="edit_button">✏️</a>
 				<a class="icon" href="#new_project" title="New project">➕</a>
 			</span> 
 		</radio-list>
 		<radio-list id="destinations">			
 			<span>Destinations</span>
 			<span style="float:right;margin-top:-2px;">								
-				<a class="icon" href="#new_project" title="Edit destination">✏️</a>
-				<a class="icon" href="#new_project" title="New destination">➕</a>
+				<a class="icon" href="#" title="Delete destination" id="del_button">🗑</a>
+				<a class="icon" href="#" title="Edit destination" id="edit_button">✏️</a>
+				<a class="icon" href="#" title="New destination" id="new_button">➕</a>
 			</span> 
 		</radio-list>
 		<radio-list id="panels">
-			Panels
+			<span>Panels</span>
+			<span style="float:right;margin-top:-2px;">								
+				<a class="icon" href="#" title="Delete panel" id="del_button">🗑</a>
+				<a class="icon" href="#" title="Edit panel" id="edit_button">✏️</a>
+				<a class="icon" href="#" title="New panel" id="new_button">➕</a>
+			</span> 
 		</radio-list>
 	</template>
 
 	<!-- new project-->
 	<template id="new_project">
-		<div class="page">
-			<div class="page-title">Create project</div>
-			<div>
-				Name
-				<input type="text">
-			</div>
-			<div>
-				Description
-				<input type="text">
-			</div>
-			<div>				
-				<input type="submit" value="Save">
-			</div>
-		</div>
+		<app-form data='{"title":"New project","fields":["name","description"]}'></app-form>
+	</template>
 
+	<!-- edit project-->
+	<template id="edit_project">
+		<app-form data='{"title":"Edit project","fields":["id","name","description"],"hidden_fields":["id"]}'></app-form>
+	</template>
+
+	<!-- new destination-->
+	<template id="new_destination">
+		<app-form data='{"title":"New destination","fields":["name","description","project_id"],"hidden_fields":["project_id"]}'></app-form>
+	</template>
+
+	<!-- new panel-->
+	<template id="new_panel">
+		<app-form data='{"title":"New panel","fields":["name","description","project_id"],"hidden_fields":["project_id"]}'></app-form>
+	</template>
+
+	<!-- edit destination-->
+	<template id="edit_destination">
+		<app-form data='{"title":"Edit destination","fields":["id","name","description","project_id"],"hidden_fields":["id","project_id"]}'></app-form>
 	</template>
 
 	<template id="test">
-		<new-form></new-form>
+		<app-form data='{"title":"New project","fields":["name","description"]}'></app-form>
 	</template>
-
-
-
-
 
 	<!-- edit panel -->
 	<template id="edit_panel">
@@ -80,7 +89,7 @@
 	<div class="menu">
 
 		<div class="menu-item">
-			<a href="#projects_list">Projects list</a>
+			<a href="#">Projects list</a>
 		</div>
 
 		<div class="menu-item">

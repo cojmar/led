@@ -58,7 +58,7 @@ document.addEventListener('DOMContentLoaded', () => new class {
 	}
 
 	save_form(url, cb) {
-		document.querySelector('new-form').onsubmit(async(data) => {
+		document.querySelector('app-form').onsubmit(async(data) => {
 			let r = await this.server(url, data)
 			if (typeof cb === 'function') cb(r)
 		})
@@ -209,7 +209,7 @@ document.addEventListener('DOMContentLoaded', () => new class {
 			return
 		}
 
-		let form = document.querySelector('new-form')
+		let form = document.querySelector('app-form')
 		form.querySelector('.page-title').innerHTML = `Edit project ${project.id}`
 		form.set_data(project)
 
@@ -239,7 +239,7 @@ document.addEventListener('DOMContentLoaded', () => new class {
 
 		let project_index = data.findIndex((v) => v.id === project_id)
 
-		let form = document.querySelector('new-form')
+		let form = document.querySelector('app-form')
 		form.set_data({ project_id: project_id })
 
 		this.save_form('save_destination', (r) => {
@@ -282,7 +282,7 @@ document.addEventListener('DOMContentLoaded', () => new class {
 			return
 		}
 
-		let form = document.querySelector('new-form')
+		let form = document.querySelector('app-form')
 		form.querySelector('.page-title').innerHTML = `Edit destination ${id}`
 		form.set_data(destination)
 
@@ -324,7 +324,7 @@ document.addEventListener('DOMContentLoaded', () => new class {
 
 
 		console.log(destination_index)
-		let form = document.querySelector('new-form')
+		let form = document.querySelector('app-form')
 		form.set_data({ project_id: project_id })
 
 		this.save_form('save_panel', (r) => {
@@ -370,7 +370,7 @@ document.addEventListener('DOMContentLoaded', () => new class {
 			return
 		}
 
-		let form = document.querySelector('new-form')
+		let form = document.querySelector('app-form')
 		form.querySelector('.page-title').innerHTML = `Edit panel ${id}`
 		form.set_data(panel)
 

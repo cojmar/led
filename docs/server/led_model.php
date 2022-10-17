@@ -1,5 +1,5 @@
 <?php
-class server_model
+class led_model
 {
     function __construct()
     {
@@ -55,10 +55,12 @@ class server_model
     {
         if (empty($project_id)) return false;
         $sqls = array();
-        $sqls[] = "delete from led_panels_data where destination_id in (select * from led_destinations where project_id=$project_id)";
+        $sqls[] = "delete from led_panels_data where destination_id in (select id from led_destinations where project_id=$project_id)";
         $sqls[] = "delete from led_destinations where project_id=$project_id";
         $sqls[] = "delete from led_panels where project_id=$project_id";
         $sqls[] = "delete from led_projects where id=$project_id";
+
+
 
         foreach ($sqls as $sql)
             $this->db->query($sql);
@@ -77,7 +79,7 @@ class server_model
         if (empty($destination_id)) return false;
         $sqls = array();
         $sqls[] = "delete from led_panels_data where destination_id = $destination_id";
-        $sqls[] = "delete from led_destinations where destination_id=$destination_id";
+        $sqls[] = "delete from led_destinations where id=$destination_id";
 
         foreach ($sqls as $sql)
             $this->db->query($sql);
@@ -96,7 +98,7 @@ class server_model
         if (empty($panel_id)) return false;
         $sqls = array();
         $sqls[] = "delete from led_panels_data where panel_id = $panel_id";
-        $sqls[] = "delete from led_panels where panel_id = $panel_id";
+        $sqls[] = "delete from led_panels where id = $panel_id";
 
         foreach ($sqls as $sql)
             $this->db->query($sql);

@@ -1,4 +1,4 @@
-window.customElements.define('new-form', class extends HTMLElement {
+window.customElements.define('app-form', class extends HTMLElement {
 
 	capitalizeFirstLetter(string) {
 		string = string.toString()

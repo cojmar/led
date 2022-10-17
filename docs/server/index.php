@@ -6,17 +6,77 @@ class router
 
     function projects_list()
     {
-        $out = $this->server_model->projects_list();
+        $out = $this->led_model->projects_list();
+        json_output($out);
+    }
+
+    function save_project()
+    {
+        $validate = array("name");
+        foreach ($validate as $field) if (empty($this->post_data[$field])) json_output(array("error" => "missing field $field"));
+
+        $out = $this->led_model->add_edit_project($this->post_data);
+        json_output($out);
+    }
+
+    function del_project()
+    {
+        $validate = array("id");
+        foreach ($validate as $field) if (empty($this->post_data[$field])) json_output(array("error" => "missing field $field"));
+
+        $out = $this->led_model->delete_project($this->post_data['id']);
+        json_output($out);
+    }
+
+    function save_destination()
+    {
+        $validate = array("name", "project_id");
+        foreach ($validate as $field) if (empty($this->post_data[$field])) json_output(array("error" => "missing field $field"));
+
+        $out = $this->led_model->add_edit_destination($this->post_data);
+        json_output($out);
+    }
+
+    function del_destination()
+    {
+        $validate = array("id");
+        foreach ($validate as $field) if (empty($this->post_data[$field])) json_output(array("error" => "missing field $field"));
+
+        $out = $this->led_model->delete_destination($this->post_data['id']);
+        json_output($out);
+    }
+
+    function save_panel()
+    {
+        $validate = array("name", "project_id");
+        foreach ($validate as $field) if (empty($this->post_data[$field])) json_output(array("error" => "missing field $field"));
+
+        $out = $this->led_model->add_edit_panel($this->post_data);
+        json_output($out);
+    }
+
+    function del_panel()
+    {
+        $validate = array("id");
+        foreach ($validate as $field) if (empty($this->post_data[$field])) json_output(array("error" => "missing field $field"));
+
+        $out = $this->led_model->delete_panel($this->post_data['id']);
         json_output($out);
     }
 
 
-
-    //==Custom Init
+    //==Init
     private function init()
     {
+
+        try {
+            $this->post_data = json_decode(file_get_contents('php://input'), 1);
+        } catch (\Throwable $th) {
+            $this->post_data = array();
+        }
+
         $this->db = new db_class();
-        $this->server_model = new server_model();
+        $this->led_model = new led_model();
         $this->db->connect("localhost", "root", "asdasd", "led_panel");
     }
 
