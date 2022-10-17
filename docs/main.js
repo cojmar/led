@@ -464,6 +464,31 @@ window.customElements.define('radio-list', class extends HTMLElement {
 
 })
 
+//component toast-notifications
+window.customElements.define('toast-notifications', class extends HTMLElement {
+	template() {
+		return `
+		<style>
+			.container{
+				border: 2px solid;
+				background-color:darkblue;
+			}
+		</style>
+		<div style="container">
+			aa
+		</div>
+		
+		`
+	}
+
+
+	constructor() {
+		super()
+		this.attachShadow({ mode: "open" })
+		this.shadowRoot.innerHTML = this.template()
+	}
+})
+
 
 // main js
 document.addEventListener('DOMContentLoaded', () => new class {
