@@ -70,6 +70,26 @@ window.customElements.define('app-form', class extends HTMLElement {
 
 })
 
+//component led-dev
+window.customElements.define('led-dev', class extends HTMLElement {
+
+	template() {
+		return `
+        <div class="page">
+        aa
+        </div>
+        `
+	}
+
+	constructor() {
+		super()
+		this.innerHTML = this.template()
+
+
+	}
+
+})
+
 //component led-panel
 window.customElements.define('led-panel',
 	class extends HTMLElement {
@@ -468,14 +488,10 @@ window.customElements.define('radio-list', class extends HTMLElement {
 window.customElements.define('toast-notifications', class extends HTMLElement {
 	template() {
 		return `
-		<style>
-			.container{
-				border: 2px solid;
-				background-color:darkblue;
-			}
-		</style>
-		<div style="container">
-			aa
+		<div class="toast_container">
+			<span class="toast">
+				aa
+			</span>
 		</div>
 		
 		`
@@ -484,8 +500,7 @@ window.customElements.define('toast-notifications', class extends HTMLElement {
 
 	constructor() {
 		super()
-		this.attachShadow({ mode: "open" })
-		this.shadowRoot.innerHTML = this.template()
+		this.innerHTML = this.template()
 	}
 })
 
