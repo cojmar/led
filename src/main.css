@@ -164,6 +164,7 @@ a{
     top: 50px;
     bottom: 0px;
     right: 0px;
+    overflow: auto;
 }
 
 .top-menu{

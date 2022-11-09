@@ -84,6 +84,28 @@
 		</led-panel>
 	</template>
 
+	<!-- fonts -->
+	<template id="fonts">
+	
+	</template>
+
+	<!-- new font -->
+	<template id="new_font">
+		<app-form data='{ "submit_label":"Generate", "title":"New font"}'>
+			<div>
+				Base font
+				<input type="text" name="base_font" value="slkscr">
+				Char map
+				<input type="text" name="charmap" value="1234567890abcdefghijklmnopqrstuvxyzABCDEFGHIJKLMNOPQRSTUVXYZ!@#$%^&*()">
+				Width
+				<input type="number" name="width" value="7">
+				Height
+				<input type="number" name="height" value="13">
+			</div>						
+		</app-form>
+		<div class="edit_font"></div>
+	</template>
+
 	<!-- top menu-->
 	<div class="top-menu">
 		<img src="img/thoreblogobranco.png" alt="" width="130px;" style="margin: 5px;">
@@ -102,6 +124,14 @@
 
 		<div class="menu-item">
 			<a href="#edit_panel">Edit panel</a>
+		</div>
+
+		<div class="menu-item">
+			<a href="#fonts">Fonts</a>
+		</div>
+
+		<div class="menu-item">
+			<a href="#new_font">New Font</a>
 		</div>
 
 	</div>

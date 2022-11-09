@@ -392,6 +392,103 @@ document.addEventListener('DOMContentLoaded', () => new class {
 
 	}
 
+	page_new_font(id, destination_index) {
+		document.querySelector('app-form').onsubmit((data) => {
+			this.new_font(data)
+		})
+	}
 
+	// fonts
+
+	load_font(font) {
+		let font_name = font.split(' ').slice(-1)[0]
+		return new Promise(r => {
+			if (document.fonts.check(font)) r(true)
+			else {
+				let my_font = new FontFace(font_name, `url(fonts/${font_name}.ttf)`)
+				my_font.load().then((font) => {
+					document.fonts.add(font);
+					r(true)
+				}).catch(e => {
+					r(false)
+				});
+			}
+		})
+
+	}
+
+	async new_font(data) {
+		let font = {
+			name: `${data.base_font}-${data.width}x${data.height}`,
+			width: parseInt(data.width),
+			height: parseFloat(data.height),
+			chars: []
+		}
+
+		let container = document.querySelector('.container')
+
+		let font_to_use = `${font.height}px ${data.base_font}`
+		let font_loaded = await this.load_font(font_to_use)
+
+		if (!font_loaded) {
+			console.log(`custom font not found in fonts folder, using Arial`)
+			font_to_use = `${font.height}px Arial`
+		}
+
+		let canvas = document.createElement('canvas')
+		let ctx = canvas.getContext('2d')
+
+		canvas.width = font.width
+		canvas.height = font.height
+		ctx.fillStyle = "red"
+		ctx.textBaseline = 'top'
+		ctx.textAlign = 'center'
+		ctx.textRendering = 'geometricPrecision'
+		ctx.font = font_to_use
+
+		let charmap = data.charmap.split('')
+		charmap.map(c => {
+			ctx.clearRect(0, 0, canvas.width, canvas.height);
+			ctx.fillText(c, canvas.width / 2, 0)
+			let img_data = ctx.getImageData(0, 0, canvas.width, canvas.height)
+			let pixels = []
+			for (let i = 0; i < img_data.data.length; i += 4) {
+				let has_color = img_data.data[i] === 255 ? 1 : 0
+				if (img_data.data[i + 3] < 90) has_color = false
+				pixels.push(has_color)
+			}
+
+			font.chars.push({
+				char: c,
+				pixels: pixels
+			})
+		})
+
+		this.edit_font(font)
+
+
+	}
+	edit_font(font) {
+		let el = document.querySelector('.edit_font')
+		el.innerHTML = ''
+
+
+		let template = (w, h, c) => `
+			<form class="page letter_form">
+				<input type="text" name="char" value="${c.char}">
+				<led-canvas data='${JSON.stringify({width:w,height:h,pixels:c.pixels})}'></led-canvas>
+			</form>
+		`
+		el.innerHTML = font.chars.map(c => template(font.width, font.height, c)).join('')
+
+		Array.from(document.querySelectorAll('.letter_form')).map(f => {
+			f.onsubmit = (e) => {
+				console.log('a')
+			}
+		})
+
+
+
+	}
 
 })

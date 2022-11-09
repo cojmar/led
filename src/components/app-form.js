@@ -27,6 +27,8 @@ window.customElements.define('app-form', class extends HTMLElement {
 		}
 
 		let title = data.title || ''
+		let old_html = this.innerHTML
+		let submit_label = data.submit_label || 'Save'
 
 		let hidden_fields = data.hidden_fields || []
 
@@ -49,8 +51,9 @@ window.customElements.define('app-form', class extends HTMLElement {
             <form autocomplete="off">
                 <div class="page-title">${title}</div>
                 ${fields}
+				${old_html}
                 <div>				
-                    <input type="submit" value="Save">
+                    <input type="submit" value="${submit_label}">
                 </div>
             </form>
         </div>
