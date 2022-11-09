@@ -394,6 +394,7 @@ document.addEventListener('DOMContentLoaded', () => new class {
 
 	page_new_font(id, destination_index) {
 		document.querySelector('app-form').onsubmit((data) => {
+
 			this.new_font(data)
 		})
 	}
@@ -454,7 +455,8 @@ document.addEventListener('DOMContentLoaded', () => new class {
 			let pixels = []
 			for (let i = 0; i < img_data.data.length; i += 4) {
 				let has_color = img_data.data[i] === 255 ? 1 : 0
-				if (img_data.data[i + 3] < 90) has_color = false
+				if (img_data.data[i + 3] < 90) has_color = 0
+				if (data.make_empty_template) has_color = 0
 				pixels.push(has_color)
 			}
 
@@ -473,7 +475,6 @@ document.addEventListener('DOMContentLoaded', () => new class {
 		let el = document.querySelector('.edit_font')
 		el.innerHTML = ''
 
-		this.font = font
 
 		let template = (w, h, c) => `
 			<form class="page letter_form">
@@ -493,9 +494,9 @@ document.addEventListener('DOMContentLoaded', () => new class {
 					pixels: f.querySelector('led-canvas').get_pixels_data()
 				}
 
-				let index = this.font.chars.findIndex(c => c.char === char)
-				if (!index) this.font.chars.push(data)
-				else this.font.chars[index] = data
+				let index = font.chars.findIndex(c => c.char === char)
+				if (!index) font.chars.push(data)
+				else font.chars[index] = data
 			}
 		})
 

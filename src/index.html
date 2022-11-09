@@ -93,7 +93,7 @@
 	<template id="new_font">
 		<app-form data='{ "submit_label":"Generate", "title":"New font"}'>
 			<div>
-				Base font
+				Name
 				<input type="text" name="base_font" value="slkscr">
 				Char map
 				<input type="text" name="charmap" value="1234567890abcdefghijklmnopqrstuvxyzABCDEFGHIJKLMNOPQRSTUVXYZ!@#$%^&*()">
@@ -101,6 +101,7 @@
 				<input type="number" name="width" value="7">
 				Height
 				<input type="number" name="height" value="13">
+				<label>Create Empty template<input type="checkbox" value="1" name="make_empty_template"></label>
 			</div>						
 		</app-form>
 		<div class="edit_font"></div>
