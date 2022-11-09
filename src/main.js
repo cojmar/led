@@ -467,7 +467,7 @@ document.addEventListener('DOMContentLoaded', () => new class {
 			})
 		})
 
-		this.font = font
+
 		this.edit_font(font)
 
 
@@ -477,8 +477,8 @@ document.addEventListener('DOMContentLoaded', () => new class {
 
 		el.innerHTML = ''
 		this.extra_top.innerHTML = `
-			<button class="">➕ ADD CHAR</button>
-			<button class="">💾 SAVE</button>
+			<button class="add_char">➕ ADD CHAR</button>
+			<button class="save_font">💾 SAVE</button>
 		`
 
 
@@ -488,23 +488,45 @@ document.addEventListener('DOMContentLoaded', () => new class {
 				<led-canvas data='${JSON.stringify({width:w,height:h,pixels:c.pixels,enable_click_draw:true})}' onchange="this.form.onsubmit()"></led-canvas>
 			</form>
 		`
-		el.innerHTML += font.chars.map(c => template(font.width, font.height, c)).join('')
 
-
-		Array.from(document.querySelectorAll('.letter_form')).map(f => {
-			f.onsubmit = (e) => {
-				if (e) e.preventDefault()
+		let make_font_chars = () => {
+			font.chars = []
+			Array.from(document.querySelectorAll('.letter_form')).map(f => {
 				let char = f.querySelector('input').value
-				let data = {
+				if (char === '') return false
+				font.chars.push({
 					char: char,
 					pixels: f.querySelector('led-canvas').get_pixels_data()
-				}
+				})
+			})
 
-				let index = font.chars.findIndex(c => c.char === char)
-				if (!index) font.chars.push(data)
-				else font.chars[index] = data
-			}
-		})
+			let charmap_input = document.querySelector('.font_charmap')
+			if (charmap_input) charmap_input.value = charmap_input.value = font.chars.map(c => c.char).join('')
+		}
+
+		let map_forms = () => {
+			Array.from(document.querySelectorAll('.letter_form')).map(f => {
+				f.onsubmit = (e) => {
+					if (e) e.preventDefault()
+					make_font_chars()
+				}
+			})
+		}
+
+		el.innerHTML += font.chars.map(c => template(font.width, font.height, c)).join('')
+		map_forms()
+
+		document.querySelector('.add_char').onclick = () => {
+			el.innerHTML += template(font.width, font.height, { char: '', pixels: Array(font.width * font.height).fill(0) })
+			map_forms()
+
+			let cont = document.querySelector('.container')
+			cont.scrollTop = cont.scrollHeight
+		}
+
+		document.querySelector('.save_font').onclick = () => {
+			console.log(font)
+		}
 
 
 

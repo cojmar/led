@@ -4,7 +4,7 @@ window.customElements.define('led-canvas', class extends HTMLElement {
 		return `
         <style>
             .led_canvas{
-                border:1px solid red;
+                border:1px solid black;
                 font-smooth: never;
             }
            
