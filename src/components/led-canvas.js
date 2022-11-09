@@ -1,5 +1,5 @@
 window.customElements.define('led-canvas', class extends HTMLElement {
-
+	static formAssociated = true
 	template() {
 		return `
         <style>
@@ -12,8 +12,12 @@ window.customElements.define('led-canvas', class extends HTMLElement {
         <canvas class="led_canvas"></canvas>
         `
 	}
+	get form() {
+		return this.internals.form
+	}
 	constructor() {
 		super()
+		this.internals = this.attachInternals()
 		this.innerHTML = this.template()
 		this.canvas = this.querySelector('canvas')
 		this.ctx = this.canvas.getContext('2d')
@@ -30,11 +34,44 @@ window.customElements.define('led-canvas', class extends HTMLElement {
 			zoom_factor: 20,
 			on_color: 'yellow',
 			off_color: 'RGB(51, 51, 51)',
+			enable_click_draw: false,
 			pixels: []
 		}, this.data)
 
+		this.canvas.onclick = (e) => {
+			let rect = e.target.getBoundingClientRect();
+			let x = e.clientX - rect.left; //x position within the element.
+			let y = e.clientY - rect.top; //y position within the element.
+			this.on_click(x, y)
+		}
+
 		this.init_data()
 		this.render()
+	}
+
+	on_click(ex, ey) {
+		if (!this.data.enable_click_draw) return false
+
+		let x = Math.floor(ex / this.data.zoom_factor)
+		let y = Math.floor(ey / this.data.zoom_factor)
+
+		let v = this.get_pixel(x, y) ? 0 : 1
+		this.set_pixel(x, y, v)
+
+	}
+	get_pixel(x, y) {
+		let i = (y * this.data.width + x)
+		return this.data.pixels[i]
+	}
+	set_pixel(x, y, v = 1) {
+		let i = (y * this.data.width + x)
+		this.data.pixels[i] = v
+		this.render()
+		this.dispatchEvent(new Event('change'))
+	}
+
+	get_pixels_data() {
+		return this.data.pixels
 	}
 
 	init_data() {
@@ -42,18 +79,16 @@ window.customElements.define('led-canvas', class extends HTMLElement {
 		this.canvas.height = this.data.height * this.data.zoom_factor
 	}
 
-	set_pixel(x, y, color) {
+	render_pixel(x, y, color) {
 
+		let r = (this.data.zoom_factor / 2)
 
-		let factor = this.data.zoom_factor
-		let r = (factor / 2)
-
-		let nx = (x * factor) + r
-		let ny = (y * factor) + r
+		let nx = (x * this.data.zoom_factor) + r
+		let ny = (y * this.data.zoom_factor) + r
 
 		let pixel_color = (color) ? this.data.on_color : this.data.off_color
 		this.ctx.beginPath();
-		this.ctx.arc(nx, ny, r, 0, 2 * Math.PI, false);
+		this.ctx.arc(nx, ny, r - 1, 0, 2 * Math.PI, false);
 		this.ctx.fillStyle = pixel_color;
 		this.ctx.fill()
 	}
@@ -65,7 +100,7 @@ window.customElements.define('led-canvas', class extends HTMLElement {
 		let x = 0
 		let y = 0
 		this.data.pixels.map(pixel => {
-			this.set_pixel(x, y, pixel)
+			this.render_pixel(x, y, pixel)
 			x++
 			if (x >= this.data.width) {
 				x = 0

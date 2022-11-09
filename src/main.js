@@ -449,7 +449,7 @@ document.addEventListener('DOMContentLoaded', () => new class {
 		let charmap = data.charmap.split('')
 		charmap.map(c => {
 			ctx.clearRect(0, 0, canvas.width, canvas.height);
-			ctx.fillText(c, canvas.width / 2, 0)
+			ctx.fillText(c, Math.ceil(canvas.width / 2), 0)
 			let img_data = ctx.getImageData(0, 0, canvas.width, canvas.height)
 			let pixels = []
 			for (let i = 0; i < img_data.data.length; i += 4) {
@@ -464,6 +464,7 @@ document.addEventListener('DOMContentLoaded', () => new class {
 			})
 		})
 
+		this.font = font
 		this.edit_font(font)
 
 
@@ -472,18 +473,29 @@ document.addEventListener('DOMContentLoaded', () => new class {
 		let el = document.querySelector('.edit_font')
 		el.innerHTML = ''
 
+		this.font = font
 
 		let template = (w, h, c) => `
 			<form class="page letter_form">
-				<input type="text" name="char" value="${c.char}">
-				<led-canvas data='${JSON.stringify({width:w,height:h,pixels:c.pixels})}'></led-canvas>
+				<input type="text" name="char" value="${c.char}" onchange="this.form.onsubmit()" maxlength="1" autocomplete="off">
+				<led-canvas data='${JSON.stringify({width:w,height:h,pixels:c.pixels,enable_click_draw:true})}' onchange="this.form.onsubmit()"></led-canvas>
 			</form>
 		`
 		el.innerHTML = font.chars.map(c => template(font.width, font.height, c)).join('')
 
+
 		Array.from(document.querySelectorAll('.letter_form')).map(f => {
 			f.onsubmit = (e) => {
-				console.log('a')
+				if (e) e.preventDefault()
+				let char = f.querySelector('input').value
+				let data = {
+					char: char,
+					pixels: f.querySelector('led-canvas').get_pixels_data()
+				}
+
+				let index = this.font.chars.findIndex(c => c.char === char)
+				if (!index) this.font.chars.push(data)
+				else this.font.chars[index] = data
 			}
 		})
 

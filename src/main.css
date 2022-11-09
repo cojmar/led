@@ -207,3 +207,9 @@ a{
 .toast{    
     background-color: red;
 }
+
+canvas{
+    left:50px;
+    font-smooth: never;
+    -webkit-font-smoothing : none;
+}
