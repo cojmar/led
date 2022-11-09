@@ -9,11 +9,13 @@
 
     --nav-color:#1565c0;
 
-    --button-background-color: rgba(34, 33, 33, 0.418);
-    --button-background-color-hover: rgba(34, 33, 33, 0.815);
-    --button-text-color: #cccccc71;
-    --button-text-color-hover: #cccccc;
+    --a-background-color: rgba(34, 33, 33, 0.418);
+    --a-background-color-hover: rgba(34, 33, 33, 0.815);
+    --a-text-color: #cccccc71;
+    --a-text-color-hover: #cccccc;
 
+    --button-background-color:#4CAF50;
+    --button-background-color-hover:#45a049;
 
     --font-size: 13px;
     --border-width: 2px;
@@ -95,11 +97,11 @@ html{
 
 a.selected {
     background-color: var(--background-color);
-    color: var(--button-text-color-hover);   
+    color: var(--a-text-color-hover);   
 }
 
 a:hover{
-    color: var(--button-text-color-hover);  
+    color: var(--a-text-color-hover);  
 }
 
 a.selected::before {
@@ -131,10 +133,11 @@ input[type=text], select {
     box-sizing: border-box;
   }
   
+  
   input[type=submit] {
     font-size: 20px;
     width: 100%;
-    background-color: #4CAF50;
+    background-color: var(--button-background-color);
     color: white;
     padding: 14px 20px;
     margin: 8px 0;
@@ -143,8 +146,18 @@ input[type=text], select {
     cursor: pointer;
   }
   
+  button:hover,
   input[type=submit]:hover {
-    background-color: #45a049;
+    background-color:var(--button-background-color-hover) ;
+  }
+
+  button{
+    cursor: pointer;
+    background-color: var(--button-background-color);
+    color: white;
+    font-size: 20px;    
+    padding: 5px;
+    padding-right:8px;
   }
 
 .page{
@@ -153,7 +166,7 @@ input[type=text], select {
 
 
 a{
-    color: var(--button-text-color);
+    color: var(--a-text-color);
     text-decoration: none;
     margin-left: 15px;
 }
@@ -176,6 +189,12 @@ a{
     background-color: var(--nav-color);    
     box-shadow: 0 2px 5px 0 rgba(0,0,0,.3);
     z-index:3;
+}
+
+.top-extra-menu{
+    margin-left: 10px;
+    margin-top: 4px;
+    float:left;
 }
 
 .menu{

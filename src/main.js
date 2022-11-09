@@ -10,7 +10,8 @@ document.addEventListener('DOMContentLoaded', () => new class {
 	// router
 	router() {
 		let container = document.querySelector('.container')
-		container.innerHTML = ''
+		this.extra_top = document.querySelector('.top-extra-menu')
+		container.innerHTML = this.extra_top.innerHTML = ''
 
 		let url_data = window.location.hash.substring(1) || 'projects_list'
 		url_data = url_data.split('/')
@@ -473,7 +474,12 @@ document.addEventListener('DOMContentLoaded', () => new class {
 	}
 	edit_font(font) {
 		let el = document.querySelector('.edit_font')
+
 		el.innerHTML = ''
+		this.extra_top.innerHTML = `
+			<button class="">➕ ADD CHAR</button>
+			<button class="">💾 SAVE</button>
+		`
 
 
 		let template = (w, h, c) => `
@@ -482,7 +488,7 @@ document.addEventListener('DOMContentLoaded', () => new class {
 				<led-canvas data='${JSON.stringify({width:w,height:h,pixels:c.pixels,enable_click_draw:true})}' onchange="this.form.onsubmit()"></led-canvas>
 			</form>
 		`
-		el.innerHTML = font.chars.map(c => template(font.width, font.height, c)).join('')
+		el.innerHTML += font.chars.map(c => template(font.width, font.height, c)).join('')
 
 
 		Array.from(document.querySelectorAll('.letter_form')).map(f => {
