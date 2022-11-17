@@ -64,6 +64,39 @@ class router
         json_output($out);
     }
 
+    function save_font()
+    {
+        $validate = array("name", "width", "height", "chars");
+        foreach ($validate as $field) if (empty($this->post_data[$field])) json_output(array("error" => "missing field $field"));
+
+        $font = json_encode($this->post_data);
+        $fonts_folder = "../pixel_fonts/";
+
+        file_put_contents($fonts_folder . $this->post_data['name'], $font);
+
+        json_output(array());
+    }
+
+    function fonts_list()
+    {
+        $fonts_folder = "../pixel_fonts/";
+        $scanned_directory = array_values(array_diff(scandir($fonts_folder), array('..', '.')));
+        json_output($scanned_directory);
+    }
+
+    function pixel_font()
+    {
+        $fonts_folder = "../pixel_fonts/";
+        $validate = array("name");
+        foreach ($validate as $field) if (empty($this->post_data[$field])) json_output(array("error" => "missing field $field"));
+
+        $font_name = $fonts_folder . $this->post_data['name'];
+
+        if (!file_exists($font_name)) json_output(array("error" => "missing font $font_name"));
+
+        die(file_get_contents($font_name));
+    }
+
 
     //==Init
     private function init()

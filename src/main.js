@@ -59,7 +59,9 @@ document.addEventListener('DOMContentLoaded', () => new class {
 	}
 
 	save_form(url, cb) {
-		document.querySelector('app-form').onsubmit(async(data) => {
+		let form = document.querySelector('app-form')
+		if (!form) return false
+		form.onsubmit(async(data) => {
 			let r = await this.server(url, data)
 			if (typeof cb === 'function') cb(r)
 		})
@@ -372,8 +374,11 @@ document.addEventListener('DOMContentLoaded', () => new class {
 		}
 
 		let form = document.querySelector('app-form')
-		form.querySelector('.page-title').innerHTML = `Edit panel ${id}`
-		form.set_data(panel)
+		if (form) {
+			form.querySelector('.page-title').innerHTML = `Edit panel ${id}`
+			form.set_data(panel)
+		}
+
 
 		this.save_form('save_panel', (r) => {
 			if (r.error) this.log(r.error)
@@ -398,6 +403,20 @@ document.addEventListener('DOMContentLoaded', () => new class {
 
 			this.new_font(data)
 		})
+	}
+
+	async page_fonts() {
+		let r = await this.server('fonts_list')
+
+		let cont = document.querySelector('.container')
+		cont.innerHTML = '<ul>' + r.map(f => `<li><a style="color:black" href='#edit_font/${f}'>${f}</a></li>`).join('\n') + '</ul>'
+
+	}
+
+	async page_edit_font(font_name) {
+		let r = await this.server('pixel_font', { name: font_name })
+		document.querySelector('#font_name').innerHTML = font_name
+		this.edit_font(r)
 	}
 
 	// fonts
@@ -426,8 +445,6 @@ document.addEventListener('DOMContentLoaded', () => new class {
 			height: parseFloat(data.height),
 			chars: []
 		}
-
-		let container = document.querySelector('.container')
 
 		let font_to_use = `${font.height}px ${data.base_font}`
 		let font_loaded = await this.load_font(font_to_use)
@@ -524,8 +541,9 @@ document.addEventListener('DOMContentLoaded', () => new class {
 			cont.scrollTop = cont.scrollHeight
 		}
 
-		document.querySelector('.save_font').onclick = () => {
-			console.log(font)
+		document.querySelector('.save_font').onclick = async() => {
+			let r = await this.server('save_font', font)
+			window.location.href = '#fonts'
 		}
 
 
