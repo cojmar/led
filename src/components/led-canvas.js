@@ -51,6 +51,7 @@ window.customElements.define('led-canvas', class extends HTMLElement {
 
 		this.init_data()
 		this.render()
+		setInterval(() => this.animate(), 500);
 
 	}
 
@@ -132,17 +133,29 @@ window.customElements.define('led-canvas', class extends HTMLElement {
 
 		if (!this.areas) return false
 
-		let green_area
-		this.ctx.lineWidth = 6
+
+		this.ctx.lineWidth = 4
 		this.ctx.strokeStyle = "red"
 
 		this.areas.map((a, i) => {
-			if (i === this.selected_area) green_area = [a.x * this.data.zoom_factor, a.y * this.data.zoom_factor, (a.width) * this.data.zoom_factor, (a.height) * this.data.zoom_factor]
+			if (i === this.selected_area) this.green_area = [a.x * this.data.zoom_factor, a.y * this.data.zoom_factor, (a.width) * this.data.zoom_factor, (a.height) * this.data.zoom_factor]
 			else this.ctx.strokeRect(a.x * this.data.zoom_factor, a.y * this.data.zoom_factor, (a.width) * this.data.zoom_factor, (a.height) * this.data.zoom_factor)
 		})
 
 		this.ctx.strokeStyle = "green"
-		this.ctx.strokeRect(...green_area)
+		this.ctx.strokeRect(...this.green_area)
+
+	}
+	animate() {
+		if (!this.use_animation) return false
+		if (!this.green_area) return false
+		if (!this.color) this.color = "green"
+
+		this.color = (this.color === "green") ? "lime" : "green"
+
+		this.ctx.strokeStyle = this.color
+		this.ctx.strokeRect(...this.green_area)
+
 
 	}
 

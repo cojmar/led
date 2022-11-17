@@ -7,7 +7,12 @@ window.customElements.define('led-dev', class extends HTMLElement {
 			.font_toolbar input
 			{
 				width:200px;
-			}			
+			}
+
+			.font_toolbar span{
+				cursor:pointer;
+				user-select: none;
+			}
            
         </style>
         
@@ -19,6 +24,10 @@ window.customElements.define('led-dev', class extends HTMLElement {
 					<input type="text" class="area_text">
 				Spacing:
 					<input type="number" class="area_spacing" value=0 style="width:30px;">
+					<span class="move_text_left">⬅️</span>
+					<span class="move_text_right">➡️</span>
+					<span class="move_text_up">⬆️</span>
+					<span class="move_text_down">⬇️</span>
 			</div>
 			<led-canvas data='${JSON.stringify({width:w,height:h,enable_click_draw:false})}'></led-canvas>
         </div>
@@ -67,12 +76,26 @@ window.customElements.define('led-dev', class extends HTMLElement {
 			})
 		}
 
+		this.data.areas.forEach(a => {
+			if (!a.left) a.left = 0
+			if (!a.top) a.top = 0
+		})
+
+
 		let font_select = this.querySelector('.font_select')
 		font_select.innerHTML = this.data.fonts.map((f, i) => `<option value="${i}">${f.name}</option>`).join('\n')
 		font_select.onchange = () => (this.area.font = this.data.fonts[font_select.value].name, this.render())
 
 		let area_text = this.querySelector('.area_text')
 		area_text.onkeyup = area_text.onchange = () => (this.area.text = area_text.value, this.render())
+
+		area_text.onfocus = () => {
+			this.led_canvas.use_animation = true
+		}
+
+		area_text.onblur = () => {
+			this.led_canvas.use_animation = false
+		}
 
 		let area_spacing = this.querySelector('.area_spacing')
 		area_spacing.onchange = () => (this.area.spacing = area_spacing.value, this.render())
@@ -96,9 +119,8 @@ window.customElements.define('led-dev', class extends HTMLElement {
 				area_spacing.value = this.area.spacing
 
 			}
-
-
 			area_text.focus()
+
 		}
 
 
@@ -106,6 +128,12 @@ window.customElements.define('led-dev', class extends HTMLElement {
 		this.selected_area = 0
 		this.area = this.data.areas[this.selected_area]
 		this.led_canvas.set_area_data(this.data.areas, this.selected_area)
+
+
+		this.querySelector(".move_text_left").onclick = () => (this.area.left--, this.render())
+		this.querySelector(".move_text_right").onclick = () => (this.area.left++, this.render())
+		this.querySelector(".move_text_up").onclick = () => (this.area.top--, this.render())
+		this.querySelector(".move_text_down").onclick = () => (this.area.top++, this.render())
 
 
 
@@ -135,14 +163,16 @@ window.customElements.define('led-dev', class extends HTMLElement {
 			let py = 0
 			char.pixels.map((p, i) => {
 
-				let point_x = cx + px
-				let point_y = cy + py
+				let point_x = cx + px + a.left
+				let point_y = cy + py + a.top
 
 
 				let ok = true
 				if (p === 0) ok = false
 				if (a.width - point_x <= 0) ok = false
 				if (a.height - point_y <= 0) ok = false
+				if (point_x < 0) ok = false
+				if (point_y < 0) ok = false
 
 
 
