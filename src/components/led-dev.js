@@ -1,159 +1,230 @@
 window.customElements.define('led-dev', class extends HTMLElement {
 
-	template() {
+	template(w, h) {
 		return `
         <style>
-            canvas{
-                border:1px solid red;
-                font-smooth: never;
-            }
+            .font_toolbar select,
+			.font_toolbar input
+			{
+				width:200px;
+			}			
            
         </style>
         
         <div class="page">
-        <canvas></canvas>
-        <canvas></canvas>
+			<div class="font_toolbar">
+				Font:
+					<select class="font_select"></select>
+				Text:
+					<input type="text" class="area_text">
+				Spacing:
+					<input type="number" class="area_spacing" value=0 style="width:30px;">
+			</div>
+			<led-canvas data='${JSON.stringify({width:w,height:h,enable_click_draw:false})}'></led-canvas>
         </div>
         `
 	}
 
 	constructor() {
 		super()
-		this.innerHTML = this.template()
-		this.canvas = []
-		this.ctx = []
-
-		Array.from(this.querySelectorAll('canvas')).map(c => {
-			this.canvas.push(c)
-			this.ctx.push(c.getContext('2d'))
-		})
-		this.render()
-	}
-
-	load_font(font) {
-		let font_name = font.split(' ').slice(-1)[0]
-		return new Promise(r => {
-			if (document.fonts.check(font)) r()
-			else {
-				let my_font = new FontFace(font_name, `url(fonts/${font_name}.ttf)`)
-				my_font.load().then((font) => {
-					document.fonts.add(font);
-					r()
-				});
-			}
-		})
-
-	}
-
-	async write_text(ctx, x, y, text, font) {
-		if (font) await this.load_font(font)
-		ctx.fillStyle = "green"
-		ctx.imageSmoothingEnabled = false
-
-		ctx.textBaseline = 'top'
-		ctx.font = font
-		ctx.fillText(text, x, y)
-	}
-	rgb_to_hex(r, g, b) {
-		r = r.toString(16);
-		g = g.toString(16);
-		b = b.toString(16);
-
-		if (r.length == 1)
-			r = "0" + r;
-		if (g.length == 1)
-			g = "0" + g;
-		if (b.length == 1)
-			b = "0" + b;
-
-		return "#" + r + g + b;
-	}
-	rgba_to_hex(r, g, b, a) {
-		r = r.toString(16);
-		g = g.toString(16);
-		b = b.toString(16);
-		a = Math.round(a * 255).toString(16);
-
-		if (r.length == 1)
-			r = "0" + r;
-		if (g.length == 1)
-			g = "0" + g;
-		if (b.length == 1)
-			b = "0" + b;
-		if (a.length == 1)
-			a = "0" + a;
-
-		return "#" + r + g + b + a;
-	}
-
-	get_pixel_data(canvas) {
-		let ctx = canvas.getContext('2d')
-		let img_data = ctx.getImageData(0, 0, canvas.width, canvas.height)
-		let pixels = []
-
-		for (let i = 0; i < img_data.data.length; i += 4) {
-			let r = img_data.data[i + 0]
-			let g = img_data.data[i + 1]
-			let b = img_data.data[i + 2]
-			let a = img_data.data[i + 3] / 255
-
-			let color = this.rgb_to_hex(r, g, b, a)
-
-			if (a < 0.25) color = '#000000'
-
-			pixels.push(color)
+		try {
+			this.data = JSON.parse((this.attributes.data.value) ? this.attributes.data.value : "{}")
+		} catch (error) {
+			this.data = {}
 		}
-		return pixels
+
+		this.data = Object.assign({
+			width: 0,
+			height: 0,
+			fonts: [],
+			areas: [
+
+			]
+		}, this.data)
+
+
+
+	}
+	init_data(data) {
+		if (data) {
+			Object.keys(this.data).map(k => {
+				if (data[k]) this.data[k] = data[k]
+			})
+		}
+		this.innerHTML = this.template(this.data.width, this.data.height)
+
+
+
+		if (!this.data.areas.length) {
+			this.data.areas.push({
+				x: 0,
+				y: 0,
+				width: this.data.width,
+				height: this.data.height,
+				text: '',
+				spacing: 0,
+				font: this.data.fonts[0].name || false
+			})
+		}
+
+		let font_select = this.querySelector('.font_select')
+		font_select.innerHTML = this.data.fonts.map((f, i) => `<option value="${i}">${f.name}</option>`).join('\n')
+		font_select.onchange = () => (this.area.font = this.data.fonts[font_select.value].name, this.render())
+
+		let area_text = this.querySelector('.area_text')
+		area_text.onkeyup = area_text.onchange = () => (this.area.text = area_text.value, this.render())
+
+		let area_spacing = this.querySelector('.area_spacing')
+		area_spacing.onchange = () => (this.area.spacing = area_spacing.value, this.render())
+
+		this.led_canvas = this.querySelector('led-canvas')
+		this.led_canvas.on_click = (ex, ey) => {
+			console.log(ex, ey)
+			area_text.focus()
+		}
+
+
+
+		this.selected_area = 0
+		this.area = this.data.areas[this.selected_area]
+
+
+
+		this.render()
+
 	}
 
-	zoom_canvas(canvas1, canvas2, factor) {
-		let ctx1 = canvas1.getContext('2d')
-		let ctx2 = canvas2.getContext('2d')
 
-		canvas2.width = canvas1.width * factor
-		canvas2.height = canvas1.height * factor
-		let pixel_data = this.get_pixel_data(canvas1)
+	get_area_image(a) {
+		let font = this.data.fonts.find(f => f.name === a.font)
+		let cx = 0
+		let cy = 0
+		let sep = parseInt(font.width) + parseInt(a.spacing)
+		let img_data = []
+		for (let y = 0; y <= a.height; y++) img_data.push(Array(a.width).fill(0))
+		a.text.split('').map(l => {
 
-		//console.log(JSON.stringify(pixel_data))
-
-		let x = 0
-		let y = 0
-		let r = factor
-		pixel_data.map((pixel, i) => {
-			let nx = (x * factor) + (r / 2)
-			let ny = (y * factor) + (r / 2)
-			ctx2.beginPath();
-			ctx2.arc(nx, ny, r / 2, 0, 2 * Math.PI, false);
-			ctx2.fillStyle = pixel;
-			ctx2.fill();
-			x++
-			if (x >= canvas1.width) {
-				x = 0
-				y++
+			if (l === ' ') {
+				cx += sep
+				return true
 			}
+
+			let char = font.chars.find(c => c.char === l)
+			if (!char) return false
+
+			let px = 0
+			let py = 0
+			char.pixels.map((p, i) => {
+
+				let point_x = cx + px
+				let point_y = cy + py
+
+
+				let ok = true
+				if (p === 0) ok = false
+				if (a.width - point_x <= 0) ok = false
+
+
+
+				if (ok) {
+					img_data[point_y][point_x] = p
+				}
+
+
+				px++
+				if (px >= font.width) {
+					px = 0
+					py++
+				}
+			})
+
+			cx += sep
+
+
 		})
-
-
-	}
-
-	test1() {
-
-		this.write_text(this.ctx[0], 0, 0, 'A', '30px Arial')
-		this.write_text(this.ctx[0], 20, 0, 'A', '30px Kulminoituva')
-		this.write_text(this.ctx[0], 40, 0, 'A', '12px slkscr')
-
-	}
-	async test2() {
-		this.canvas[0].width = 80
-		this.canvas[0].height = 8
-			//await this.write_text(this.ctx[0], 0, 0, 'Armata poporului', '8px slkscr')
-		await this.write_text(this.ctx[0], 0, 0, 'O', '8px slkscr')
-
-		this.zoom_canvas(this.canvas[0], this.canvas[1], 10)
+		return img_data
 	}
 
 	render() {
-		this.test2()
+		let pixel_data = this.led_canvas.empty_pixels()
+		this.data.areas.map(a => {
+			let area_image = this.get_area_image(a)
+
+
+
+
+			area_image.map((col, y) => {
+				col.map((v, x) => {
+					let ci = this.led_canvas.get_index(x + a.x, y + a.y)
+					pixel_data[ci] = v
+				})
+			})
+
+			this.led_canvas.render(pixel_data)
+
+		})
+	}
+
+	render_old() {
+
+
+		let pixel_data = this.led_canvas.empty_pixels()
+
+		this.data.areas.map(a => {
+			let font = this.data.fonts.find(f => f.name === a.font)
+			let cx = a.x
+			let cy = a.y
+			let sep = parseInt(font.width) + parseInt(a.spacing)
+
+			a.text.split('').map(l => {
+
+				if (l === ' ') {
+					cx += sep
+					return true
+				}
+
+				let char = font.chars.find(c => c.char === l)
+				if (!char) return false
+
+				let px = 0
+				let py = 0
+				char.pixels.map((p, i) => {
+
+					let point_x = cx + px
+					let point_y = cy + py
+
+
+					let ok = true
+					if (p === 0) ok = false
+					if (a.width - point_x <= 0) ok = false
+
+
+
+					if (ok) {
+						let ci = this.led_canvas.get_index(point_x, point_y)
+						pixel_data[ci] = p
+					}
+
+
+					px++
+					if (px >= font.width) {
+						px = 0
+						py++
+					}
+				})
+
+				cx += sep
+
+
+			})
+
+
+		})
+
+
+		this.led_canvas.render(pixel_data)
+
+
 
 	}
 

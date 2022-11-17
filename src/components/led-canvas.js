@@ -40,8 +40,12 @@ window.customElements.define('led-canvas', class extends HTMLElement {
 
 		this.canvas.onclick = (e) => {
 			let rect = e.target.getBoundingClientRect();
-			let x = e.clientX - rect.left; //x position within the element.
-			let y = e.clientY - rect.top; //y position within the element.
+			let ex = e.clientX - rect.left; //x position within the element.
+			let ey = e.clientY - rect.top; //y position within the element.
+
+			let x = Math.floor(ex / this.data.zoom_factor)
+			let y = Math.floor(ey / this.data.zoom_factor)
+
 			this.on_click(x, y)
 		}
 
@@ -49,18 +53,17 @@ window.customElements.define('led-canvas', class extends HTMLElement {
 		this.render()
 	}
 
-	on_click(ex, ey) {
+	on_click(x, y) {
 		if (!this.data.enable_click_draw) return false
-
-		let x = Math.floor(ex / this.data.zoom_factor)
-		let y = Math.floor(ey / this.data.zoom_factor)
-
 		let v = this.get_pixel(x, y) ? 0 : 1
 		this.set_pixel(x, y, v)
 
 	}
+	get_index(x, y) {
+		return y * this.data.width + x
+	}
 	get_pixel(x, y) {
-		let i = (y * this.data.width + x)
+		let i = this.get_index(x, y)
 		return this.data.pixels[i]
 	}
 	set_pixel(x, y, v = 1) {
@@ -77,6 +80,9 @@ window.customElements.define('led-canvas', class extends HTMLElement {
 	init_data() {
 		this.canvas.width = this.data.width * this.data.zoom_factor
 		this.canvas.height = this.data.height * this.data.zoom_factor
+		if (!this.data.pixels.length) {
+			this.data.pixels = Array(this.data.width * this.data.height).fill(0)
+		}
 	}
 
 	render_pixel(x, y, color) {
@@ -93,13 +99,23 @@ window.customElements.define('led-canvas', class extends HTMLElement {
 		this.ctx.fill()
 	}
 
-	render() {
+	empty_pixels() {
+		return Array(this.data.width * this.data.height).fill(0)
+	}
+
+	render(pixels = false) {
 		this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height)
 		this.ctx.fillStyle = 'black';
 		this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height)
 		let x = 0
 		let y = 0
-		this.data.pixels.map(pixel => {
+
+		if (pixels) this.data.pixels = pixels
+
+		let pixel_data = this.empty_pixels()
+		this.data.pixels.map((p, i) => pixel_data[i] = p)
+
+		pixel_data.map(pixel => {
 			this.render_pixel(x, y, pixel)
 			x++
 			if (x >= this.data.width) {

@@ -419,7 +419,18 @@ document.addEventListener('DOMContentLoaded', () => new class {
 		this.edit_font(r)
 	}
 
+	async page_test() {
+		let fonts = await this.load_pixel_fonts()
+		Array.from(document.querySelectorAll('led-dev')).map(el => el.init_data({ fonts: fonts, width: 80, height: 13 }))
+
+	}
+
 	// fonts
+	async load_pixel_fonts() {
+		let font_list = await this.server('fonts_list')
+		let loading_fonts = font_list.map((font_name) => this.server('pixel_font', { name: font_name }))
+		return await Promise.all(loading_fonts)
+	}
 
 	load_font(font) {
 		let font_name = font.split(' ').slice(-1)[0]
