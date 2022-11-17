@@ -421,7 +421,62 @@ document.addEventListener('DOMContentLoaded', () => new class {
 
 	async page_test() {
 		let fonts = await this.load_pixel_fonts()
-		Array.from(document.querySelectorAll('led-dev')).map(el => el.init_data({ fonts: fonts, width: 80, height: 13 }))
+		Array.from(document.querySelectorAll('led-dev')).map((el, i) => {
+
+			if (i == 1)
+				el.init_data({
+					fonts: fonts,
+					width: 80,
+					height: 13,
+					areas: [{
+							x: 0,
+							y: 0,
+							width: 30,
+							height: 13,
+							text: '',
+							spacing: 0,
+							font: fonts[0].name
+						},
+						{
+							x: 30,
+							y: 0,
+							width: 50,
+							height: 13,
+							text: '',
+							spacing: 0,
+							font: fonts[0].name
+						},
+					]
+				})
+			else if (i == 2)
+				el.init_data({
+					fonts: fonts,
+					width: 80,
+					height: 13,
+					areas: [{
+							x: 0,
+							y: 0,
+							width: 30,
+							height: 7,
+							text: '',
+							spacing: 0,
+							font: fonts[0].name
+						},
+						{
+							x: 30,
+							y: 0,
+							width: 50,
+							height: 13,
+							text: '',
+							spacing: 0,
+							font: fonts[0].name
+						},
+					]
+				})
+			else
+				el.init_data({ fonts: fonts, width: 80, height: 13 })
+
+		})
 
 	}
 

@@ -78,8 +78,26 @@ window.customElements.define('led-dev', class extends HTMLElement {
 		area_spacing.onchange = () => (this.area.spacing = area_spacing.value, this.render())
 
 		this.led_canvas = this.querySelector('led-canvas')
-		this.led_canvas.on_click = (ex, ey) => {
-			console.log(ex, ey)
+		this.led_canvas.on_click = (x, y) => {
+
+			let area_clicked = 0
+
+			this.data.areas.map((a, i) => {
+				if (x >= a.x && x <= a.x + a.width && y >= a.y && y <= a.y + a.height) area_clicked = i
+			})
+
+			if (area_clicked !== this.selected_area) {
+				this.selected_area = area_clicked
+				this.led_canvas.set_area_data(this.data.areas, this.selected_area)
+				this.area = this.data.areas[this.selected_area]
+
+				area_text.value = this.area.text
+				font_select.value = this.data.fonts.findIndex(v => v.name === this.area.font)
+				area_spacing.value = this.area.spacing
+
+			}
+
+
 			area_text.focus()
 		}
 
@@ -87,6 +105,7 @@ window.customElements.define('led-dev', class extends HTMLElement {
 
 		this.selected_area = 0
 		this.area = this.data.areas[this.selected_area]
+		this.led_canvas.set_area_data(this.data.areas, this.selected_area)
 
 
 
@@ -123,6 +142,7 @@ window.customElements.define('led-dev', class extends HTMLElement {
 				let ok = true
 				if (p === 0) ok = false
 				if (a.width - point_x <= 0) ok = false
+				if (a.height - point_y <= 0) ok = false
 
 
 

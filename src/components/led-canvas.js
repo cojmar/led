@@ -51,6 +51,7 @@ window.customElements.define('led-canvas', class extends HTMLElement {
 
 		this.init_data()
 		this.render()
+
 	}
 
 	on_click(x, y) {
@@ -103,10 +104,15 @@ window.customElements.define('led-canvas', class extends HTMLElement {
 		return Array(this.data.width * this.data.height).fill(0)
 	}
 
-	render(pixels = false) {
+
+	clear() {
 		this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height)
 		this.ctx.fillStyle = 'black';
 		this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height)
+	}
+
+	render(pixels = false) {
+		this.clear()
 		let x = 0
 		let y = 0
 
@@ -124,7 +130,29 @@ window.customElements.define('led-canvas', class extends HTMLElement {
 			}
 		})
 
+		if (!this.areas) return false
+
+		let green_area
+		this.ctx.lineWidth = 6
+		this.ctx.strokeStyle = "red"
+
+		this.areas.map((a, i) => {
+			if (i === this.selected_area) green_area = [a.x * this.data.zoom_factor, a.y * this.data.zoom_factor, (a.width) * this.data.zoom_factor, (a.height) * this.data.zoom_factor]
+			else this.ctx.strokeRect(a.x * this.data.zoom_factor, a.y * this.data.zoom_factor, (a.width) * this.data.zoom_factor, (a.height) * this.data.zoom_factor)
+		})
+
+		this.ctx.strokeStyle = "green"
+		this.ctx.strokeRect(...green_area)
+
 	}
+
+	set_area_data(areas, selected) {
+		this.areas = areas
+		this.selected_area = selected
+		this.render()
+	}
+
+
 
 
 })
