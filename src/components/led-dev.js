@@ -24,10 +24,23 @@ window.customElements.define('led-dev', class extends HTMLElement {
 					<input type="text" class="area_text">
 				Spacing:
 					<input type="number" class="area_spacing" value=0 style="width:30px;">
-					<span class="move_text_left">⬅️</span>
-					<span class="move_text_right">➡️</span>
-					<span class="move_text_up">⬆️</span>
-					<span class="move_text_down">⬇️</span>
+					<span class="move_text_left" title="Move left">⬅️</span>
+					<span class="move_text_right" title="Move right">➡️</span>
+					<span class="move_text_up" title="Move up">⬆️</span>
+					<span class="move_text_down" title="Move down">⬇️</span>
+					
+					<span class="align_top" title="Align top">A⬆</span>
+					<span class="align_down" title="Align bottom">A⬇</span>										
+
+					<span class="align_left" title="Align left">A⬅</span>										
+					<span class="align_right" title="Align right">A➡</span>
+
+					<span class="align_center_v" title="Align vertical center">A↕️</span>
+					<span class="align_center_h" title="Align horizontal center">A↔️</span>
+					<span class="align_center" title="Align center">A✛</span>
+					
+					
+
 			</div>
 			<led-canvas data='${JSON.stringify({width:w,height:h,enable_click_draw:false})}'></led-canvas>
         </div>
@@ -135,12 +148,90 @@ window.customElements.define('led-dev', class extends HTMLElement {
 		this.querySelector(".move_text_up").onclick = () => (this.area.top--, this.render())
 		this.querySelector(".move_text_down").onclick = () => (this.area.top++, this.render())
 
+		this.querySelector(".align_down").onclick = () => {
+			this.area.top = 0
+			this.render
+			let pad = this.get_area_padding(this.area)
+			this.area.top = pad[3]
+			this.render()
+		}
+
+		this.querySelector(".align_top").onclick = () => {
+			this.area.top = 0
+			this.render()
+			let pad = this.get_area_padding(this.area)
+			this.area.top = pad[1] * -1
+			this.render()
+		}
+
+		this.querySelector(".align_right").onclick = () => {
+			this.area.left = 0
+			this.render
+			let pad = this.get_area_padding(this.area)
+			this.area.left = pad[2]
+			this.render()
+		}
+
+		this.querySelector(".align_left").onclick = () => {
+			this.area.left = 0
+			this.render()
+			let pad = this.get_area_padding(this.area)
+			this.area.left = pad[0] * -1
+			this.render()
+		}
+
+
+		this.querySelector(".align_center_h").onclick = () => {
+			this.area.left = 0
+			this.render()
+			let pad = this.get_area_padding(this.area)
+			this.area.left = Math.floor((pad[0] * -1) + (Math.abs(pad[0] - pad[2]) / 2))
+			this.render()
+		}
+
+		this.querySelector(".align_center_v").onclick = () => {
+			this.area.top = 0
+			this.render()
+			let pad = this.get_area_padding(this.area)
+			this.area.top = Math.floor((pad[1] * -1) + (Math.abs(pad[1] - pad[3]) / 2))
+			this.render()
+		}
+
+		this.querySelector(".align_center").onclick = () => {
+			this.area.top = 0
+			this.area.left = 0
+			this.render()
+			let pad = this.get_area_padding(this.area)
+			this.area.top = Math.floor((pad[1] * -1) + (Math.abs(pad[1] - pad[3]) / 2))
+			this.area.left = Math.floor((pad[0] * -1) + (Math.abs(pad[0] - pad[2]) / 2))
+			this.render()
+		}
+
+
 
 
 		this.render()
 
 	}
+	get_area_padding(a) {
+		let img_data = this.get_area_image(a)
+		let ret = false
+		img_data.map((row, y) => {
+			row.map((v, x) => {
+				if (!v) return false
+				if (!ret) ret = [x, y, x, y]
+				if (x < ret[0]) ret[0] = x
+				if (y < ret[1]) ret[1] = y
 
+				if (x > ret[2]) ret[2] = x
+				if (y > ret[3]) ret[3] = y
+			})
+		})
+		if (!ret) ret = [0, 0, 0, 0]
+		ret[2] = (a.width - ret[2]) - 1
+		ret[3] = (a.height - ret[3]) - 1
+		return ret
+	}
 
 	get_area_image(a) {
 		let font = this.data.fonts.find(f => f.name === a.font)
