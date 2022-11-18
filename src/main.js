@@ -463,6 +463,17 @@ document.addEventListener('DOMContentLoaded', () => new class {
 							font: fonts[0].name
 						},
 						{
+							x: 0,
+							y: 8,
+							width: 30,
+							height: 5,
+							text: '',
+							spacing: 0,
+							font: fonts[0].name
+						}
+
+						,
+						{
 							x: 30,
 							y: 0,
 							width: 50,
