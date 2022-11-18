@@ -8,6 +8,9 @@ window.customElements.define('led-dev', class extends HTMLElement {
 			{
 				width:200px;
 			}
+			.font_toolbar{
+				user-select: none;
+			}
 
 			.font_toolbar span{
 				cursor:pointer;
@@ -38,6 +41,11 @@ window.customElements.define('led-dev', class extends HTMLElement {
 					<span class="align_center_v" title="Align vertical center">A↕️</span>
 					<span class="align_center_h" title="Align horizontal center">A↔️</span>
 					<span class="align_center" title="Align center">A✛</span>
+
+					<label>
+						<input type="checkbox" class="area_scrolling" style="width:20px;"/>
+						Scrolling text
+					</label>
 					
 					
 
@@ -64,7 +72,7 @@ window.customElements.define('led-dev', class extends HTMLElement {
 			]
 		}, this.data)
 
-
+		setInterval(() => this.update(), 300)
 
 	}
 	init_data(data) {
@@ -207,6 +215,10 @@ window.customElements.define('led-dev', class extends HTMLElement {
 			this.render()
 		}
 
+		let area_scrolling = this.querySelector('.area_scrolling')
+		this.querySelector('.area_scrolling').onclick = () => this.area.area_scrolling = area_scrolling.checked
+
+
 
 
 
@@ -231,6 +243,25 @@ window.customElements.define('led-dev', class extends HTMLElement {
 		ret[2] = (a.width - ret[2]) - 1
 		ret[3] = (a.height - ret[3]) - 1
 		return ret
+	}
+
+	update() {
+		if (!this.data.areas) return false
+
+		let render = false
+		this.data.areas.map(a => {
+			if (!a.area_scrolling) return false
+			a.left -= 1
+
+			let pad = this.get_area_padding(a)
+			let img = JSON.stringify(this.get_area_image(a))
+
+
+			if (img.indexOf('1') < 0) a.left = a.width - (pad[0] + 1)
+
+			render = true
+		})
+		if (render) this.render()
 	}
 
 	get_area_image(a) {
