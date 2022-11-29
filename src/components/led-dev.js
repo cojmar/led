@@ -62,6 +62,10 @@ window.customElements.define('led-dev', class extends HTMLElement {
 
 			</div>
 			<led-canvas data='${JSON.stringify({width:w,height:h,enable_click_draw:false})}'></led-canvas>
+			<br>
+			<button class="export_button">Export</button>
+			
+			<div class="export_area" style="float:right"></div>
         </div>
         `
 	}
@@ -84,6 +88,61 @@ window.customElements.define('led-dev', class extends HTMLElement {
 
 		//setInterval(() => this.update(), 300)
 
+	}
+
+	blobToBase64(blob) {
+		return new Promise((resolve, _) => {
+			const reader = new FileReader();
+			reader.onloadend = () => resolve(reader.result);
+			reader.readAsDataURL(blob);
+		})
+	}
+
+
+	async export_data() {
+		const { make } = window.Bmp
+		const bmp = make({
+			bits: 8,
+			width: this.data.width,
+			height: this.data.height,
+			data: this.pixel_data,
+			palette: this.data.palette
+		})
+
+
+		const blob = new Blob([bmp], { type: 'image/bmp' });
+
+		let image_data = await this.blobToBase64(blob)
+
+		let xml = `
+		<ROOT>
+			<BMP X="0" Y="0" Width="${this.data.width}" Height="${this.data.height}" Page="0">
+				${image_data}
+			</BMP>
+		</ROOT>			
+		`
+
+		this.querySelector('.export_area').innerHTML = `<img src="${image_data}">`
+		this.download(xml, `test_${this.data.width}x${this.data.height}.xml`)
+
+	}
+
+	download(data, filename, type) {
+		var file = new Blob([data], { type: type });
+		if (window.navigator.msSaveOrOpenBlob) // IE10+
+			window.navigator.msSaveOrOpenBlob(file, filename);
+		else { // Others
+			var a = document.createElement("a"),
+				url = URL.createObjectURL(file);
+			a.href = url;
+			a.download = filename;
+			document.body.appendChild(a);
+			a.click();
+			setTimeout(function() {
+				document.body.removeChild(a);
+				window.URL.revokeObjectURL(url);
+			}, 0);
+		}
 	}
 
 	init_panel(p) {
@@ -164,6 +223,7 @@ window.customElements.define('led-dev', class extends HTMLElement {
 		})
 
 
+		this.querySelector('.export_button').onclick = () => this.export_data()
 
 		let font_select = this.querySelector('.font_select')
 		font_select.innerHTML = this.data.fonts.map((f, i) => `<option value="${i}">${f.name}</option>`).join('\n')
@@ -417,6 +477,7 @@ window.customElements.define('led-dev', class extends HTMLElement {
 			this.led_canvas.render(pixel_data)
 
 		})
+		this.pixel_data = pixel_data
 	}
 
 	render_old() {
