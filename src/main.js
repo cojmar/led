@@ -421,71 +421,28 @@ document.addEventListener('DOMContentLoaded', () => new class {
 
 	async page_test() {
 		let fonts = await this.load_pixel_fonts()
+		let palette = await this.server('color_palette')
+
+
+
 		Array.from(document.querySelectorAll('led-dev')).map((el, i) => {
 
 			if (i == 1)
 				el.init_data({
 					fonts: fonts,
-					width: 80,
-					height: 13,
-					areas: [{
-							x: 0,
-							y: 0,
-							width: 30,
-							height: 13,
-							text: '',
-							spacing: 0,
-							font: fonts[0].name
-						},
-						{
-							x: 30,
-							y: 0,
-							width: 50,
-							height: 13,
-							text: '',
-							spacing: 0,
-							font: fonts[0].name
-						},
-					]
+					palette: palette,
+					width: 160,
+					height: 19,
 				})
 			else if (i == 2)
 				el.init_data({
 					fonts: fonts,
-					width: 80,
-					height: 13,
-					areas: [{
-							x: 0,
-							y: 0,
-							width: 30,
-							height: 7,
-							text: '',
-							spacing: 0,
-							font: fonts[0].name
-						},
-						{
-							x: 0,
-							y: 8,
-							width: 30,
-							height: 5,
-							text: '',
-							spacing: 0,
-							font: fonts[0].name
-						}
-
-						,
-						{
-							x: 30,
-							y: 0,
-							width: 50,
-							height: 13,
-							text: '',
-							spacing: 0,
-							font: fonts[0].name
-						},
-					]
+					palette: palette,
+					width: 128,
+					height: 19,
 				})
 			else
-				el.init_data({ fonts: fonts, width: 80, height: 13 })
+				el.init_data({ palette: palette, fonts: fonts, width: 96, height: 19 })
 
 		})
 

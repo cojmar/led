@@ -31,10 +31,11 @@ window.customElements.define('led-canvas', class extends HTMLElement {
 		this.data = Object.assign({
 			width: 100,
 			height: 100,
-			zoom_factor: 20,
+			zoom_factor: 10,
 			on_color: 'yellow',
 			off_color: 'RGB(51, 51, 51)',
 			enable_click_draw: false,
+			palette: false,
 			pixels: []
 		}, this.data)
 
@@ -95,6 +96,10 @@ window.customElements.define('led-canvas', class extends HTMLElement {
 		let ny = (y * this.data.zoom_factor) + r
 
 		let pixel_color = (color) ? this.data.on_color : this.data.off_color
+		if (this.data.palette && color > 0) pixel_color = this.data.palette[color - 1]
+
+
+
 		this.ctx.beginPath();
 		this.ctx.arc(nx, ny, r - 1, 0, 2 * Math.PI, false);
 		this.ctx.fillStyle = pixel_color;

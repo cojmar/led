@@ -24,9 +24,20 @@ window.customElements.define('led-dev', class extends HTMLElement {
 				Font:
 					<select class="font_select"></select>
 				Text:
-					<input type="text" class="area_text">
+					<input type="text" class="area_text">				
+					<input type="color" style="width:60px;" list="color_palette" class="area_color">
+					<datalist id="color_palette">
+						<option>#df0000</option>
+					</datalist>
 				Spacing:
 					<input type="number" class="area_spacing" value=0 style="width:30px;">
+
+					<select style="width:70px;" class="panel_template">
+						<option value=0>-------</option>
+						<option value=1>--|----</option>
+						<option value=2>--|====</option>
+					</select>
+
 					<span class="move_text_left" title="Move left">⬅️</span>
 					<span class="move_text_right" title="Move right">➡️</span>
 					<span class="move_text_up" title="Move up">⬆️</span>
@@ -67,14 +78,64 @@ window.customElements.define('led-dev', class extends HTMLElement {
 			width: 0,
 			height: 0,
 			fonts: [],
-			areas: [
-
-			]
+			palette: [],
+			areas: []
 		}, this.data)
 
-		setInterval(() => this.update(), 300)
+		//setInterval(() => this.update(), 300)
 
 	}
+
+	init_panel(p) {
+		switch (p) {
+			default: this.data.areas = []
+			this.init_data()
+			break
+			case "1":
+					this.init_data({
+					areas: [{
+							x: 0,
+							y: 0,
+							width: 30,
+							height: this.data.height,
+
+						},
+						{
+							x: 30,
+							y: 0,
+							height: this.data.height,
+						}
+					]
+				})
+				break
+			case "2":
+					this.init_data({
+					areas: [{
+							x: 0,
+							y: 0,
+							width: 30,
+							height: this.data.height,
+
+						},
+						{
+							x: 30,
+							y: 0,
+							height: Math.ceil(this.data.height / 2),
+						},
+						{
+							x: 30,
+							y: Math.ceil(this.data.height / 2),
+
+						}
+					]
+				})
+				break
+
+		}
+		this.querySelector(".panel_template").value = p
+	}
+
+
 	init_data(data) {
 		if (data) {
 			Object.keys(this.data).map(k => {
@@ -83,24 +144,25 @@ window.customElements.define('led-dev', class extends HTMLElement {
 		}
 		this.innerHTML = this.template(this.data.width, this.data.height)
 
-
-
 		if (!this.data.areas.length) {
 			this.data.areas.push({
-				x: 0,
-				y: 0,
-				width: this.data.width,
-				height: this.data.height,
-				text: '',
-				spacing: 0,
-				font: this.data.fonts[0].name || false
+
 			})
 		}
 
 		this.data.areas.forEach(a => {
+			if (!a.x) a.x = 0
+			if (!a.y) a.y = 0
+			if (!a.width) a.width = this.data.width - a.x
+			if (!a.height) a.height = this.data.height - a.y
 			if (!a.left) a.left = 0
 			if (!a.top) a.top = 0
+			if (!a.color) a.color = 164
+			if (!a.text) a.text = ''
+			if (!a.spacing) a.spacing = 0
+			if (!a.font) a.font = this.data.fonts[0].name || false
 		})
+
 
 
 		let font_select = this.querySelector('.font_select')
@@ -121,6 +183,8 @@ window.customElements.define('led-dev', class extends HTMLElement {
 		let area_spacing = this.querySelector('.area_spacing')
 		area_spacing.onchange = () => (this.area.spacing = area_spacing.value, this.render())
 
+		let area_color = this.querySelector('.area_color')
+
 		this.led_canvas = this.querySelector('led-canvas')
 		this.led_canvas.on_click = (x, y) => {
 
@@ -138,11 +202,14 @@ window.customElements.define('led-dev', class extends HTMLElement {
 				area_text.value = this.area.text
 				font_select.value = this.data.fonts.findIndex(v => v.name === this.area.font)
 				area_spacing.value = this.area.spacing
+				area_color.value = this.data.palette[this.area.color - 1]
 
 			}
 			area_text.focus()
 
 		}
+
+		this.led_canvas.data.palette = this.data.palette
 
 
 
@@ -151,10 +218,25 @@ window.customElements.define('led-dev', class extends HTMLElement {
 		this.led_canvas.set_area_data(this.data.areas, this.selected_area)
 
 
+		this.querySelector('#color_palette').innerHTML = this.data.palette.map(c => `<option value="${c}">${c}</option>`).join('\n')
+
+		area_color.value = this.data.palette[this.area.color - 1]
+
+
+		area_color.onchange = () => {
+			let color = this.data.palette.indexOf(area_color.value) + 1
+			this.area.color = color || 1
+			this.render()
+		}
+
 		this.querySelector(".move_text_left").onclick = () => (this.area.left--, this.render())
 		this.querySelector(".move_text_right").onclick = () => (this.area.left++, this.render())
 		this.querySelector(".move_text_up").onclick = () => (this.area.top--, this.render())
 		this.querySelector(".move_text_down").onclick = () => (this.area.top++, this.render())
+
+
+		let panel_template = this.querySelector(".panel_template")
+		panel_template.onchange = () => this.init_panel(panel_template.value)
 
 		this.querySelector(".align_down").onclick = () => {
 			this.area.top = 0
@@ -328,7 +410,7 @@ window.customElements.define('led-dev', class extends HTMLElement {
 			area_image.map((col, y) => {
 				col.map((v, x) => {
 					let ci = this.led_canvas.get_index(x + a.x, y + a.y)
-					pixel_data[ci] = v
+					pixel_data[ci] = (v) ? a.color : v
 				})
 			})
 
