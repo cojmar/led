@@ -110,6 +110,7 @@ window.customElements.define('led-dev', class extends HTMLElement {
 		})
 
 
+
 		const blob = new Blob([bmp], { type: 'image/bmp' });
 
 		let image_data = await this.blobToBase64(blob)
@@ -122,7 +123,7 @@ window.customElements.define('led-dev', class extends HTMLElement {
 		</ROOT>			
 		`
 
-		this.querySelector('.export_area').innerHTML = `<img src="${image_data}">`
+		this.querySelector('.export_area').innerHTML = `<img src="${image_data}"  style="image-rendering: pixelated;">`
 		this.download(xml, `test_${this.data.width}x${this.data.height}.xml`)
 
 	}
