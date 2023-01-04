@@ -123,8 +123,8 @@ window.customElements.define('led-dev', class extends HTMLElement {
 		</ROOT>			
 		`
 
-		this.querySelector('.export_area').innerHTML = `<img src="${image_data}"  style="image-rendering: pixelated;">`
-		this.download(xml, `test_${this.data.width}x${this.data.height}.xml`)
+		this.querySelector('.export_area').innerHTML = `<img src="${image_data}"  style="image-rendering: pixelated;width:${this.data.width*4}px">`
+			//this.download(xml, `test_${this.data.width}x${this.data.height}.xml`)
 
 	}
 

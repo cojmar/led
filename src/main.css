@@ -231,4 +231,5 @@ canvas{
     left:50px;
     font-smooth: never;
     -webkit-font-smoothing : none;
+    image-rendering: pixelated;
 }
