@@ -61,7 +61,7 @@ window.customElements.define('led-dev', class extends HTMLElement {
 					
 
 			</div>
-			<led-canvas data='${JSON.stringify({width:w,height:h,enable_click_draw:false})}'></led-canvas>
+			<led-canvas data='${JSON.stringify({ width: w, height: h, enable_click_draw: false })}'></led-canvas>
 			<br>
 			<button class="export_button">Export</button>
 			
@@ -97,9 +97,48 @@ window.customElements.define('led-dev', class extends HTMLElement {
 			reader.readAsDataURL(blob);
 		})
 	}
-
+	async postData(url = '', data = {}) {
+		// Default options are marked with *
+		const response = await fetch(url, {
+			method: 'POST', // *GET, POST, PUT, DELETE, etc.
+			mode: 'no-cors', // no-cors, *cors, same-origin
+			cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
+			credentials: 'same-origin', // include, *same-origin, omit
+			headers: {
+				//'Content-Type': 'application/json'
+				'Content-Type': 'application/x-www-form-urlencoded',
+			},
+			redirect: 'follow', // manual, *follow, error
+			referrerPolicy: 'no-referrer', // no-referrer, *no-referrer-when-downgrade, origin, origin-when-cross-origin, same-origin, strict-origin, strict-origin-when-cross-origin, unsafe-url
+			body: data //JSON.stringify(data) // body data type must match "Content-Type" header
+		});
+		return response.json(); // parses JSON response into native JavaScript objects
+	}
 
 	async export_data() {
+
+		let bitmap_data = this.pixel_data.map(pixel => {
+			if (pixel === 0) pixel = 15
+			return String.fromCharCode(pixel)
+		})
+
+		for (let i = 0; i < this.data.width; i++) bitmap_data.pop()
+
+
+
+		bitmap_data = btoa(bitmap_data.join(''))
+
+		let xml_data = `<ROOT><BMP X="0" Y="0" Width="${this.data.width}" Height="${this.data.height}" Page="0">${bitmap_data}</BMP></ROOT>`
+
+		console.log(xml_data)
+
+		//this.download(xml_data, `test_${this.data.width}x${this.data.height}.xml`)
+		//this.postData('http://10.42.102.211:2111/ConnectionMonitoringDeliveryReply', xml_data)
+
+
+
+
+
 		const { make } = window.Bmp
 		const bmp = make({
 			bits: 8,
@@ -115,15 +154,17 @@ window.customElements.define('led-dev', class extends HTMLElement {
 
 		let image_data = await this.blobToBase64(blob)
 
+		/*
 		let xml = `
 		<ROOT>
 			<BMP X="0" Y="0" Width="${this.data.width}" Height="${this.data.height}" Page="0">
-				${image_data}
+				${image_data.split(',').pop()}
 			</BMP>
 		</ROOT>			
 		`
+*/
 
-		this.querySelector('.export_area').innerHTML = `<img src="${image_data}"  style="image-rendering: pixelated;width:${this.data.width*4}px">`
+		this.querySelector('.export_area').innerHTML = `<img src="${image_data}"  style="image-rendering: pixelated;width:${this.data.width * 4}px">`
 			//this.download(xml, `test_${this.data.width}x${this.data.height}.xml`)
 
 	}

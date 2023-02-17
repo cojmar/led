@@ -160,7 +160,7 @@ document.addEventListener('DOMContentLoaded', () => new class {
 			dom.panels.querySelector('#edit_button').onclick = (e) => {
 				e.preventDefault()
 				if (!dom.panels.value) return false
-				window.location.href = `#edit_panel/${dom.panels.value.id}`
+				window.location.href = `#edit_panel/${dom.panels.value.id}-${dom.destinations.value.id}`
 			}
 
 			dom.panels.querySelector('#del_button').onclick = async(e) => {
@@ -346,32 +346,15 @@ document.addEventListener('DOMContentLoaded', () => new class {
 		})
 	}
 
-	async page_edit_panel(id, destination_index) {
-		if (!id) {
+	async page_edit_panel(id) {
+		id = id.split('-')
+		if (id.length !== 2) {
 			window.location.href = '#'
 			return
 		}
+		let data = await this.server('panel_data', { panel_id: id[0], destination_id: id[1] })
+		console.log(data)
 
-		destination_index *= 1
-
-		let data = await this.server('projects_list')
-		let project = data.find((v) => v.panels.find((v) => v.id === id))
-
-		if (!project) {
-			window.location.href = '#'
-			return
-		}
-
-
-		let panel = project.panels.find((v) => v.id === id)
-		let panel_index = project.panels.findIndex((v) => v.id === id)
-
-		let project_index = data.findIndex((v) => v.id === panel.project_id)
-
-		if (!panel) {
-			window.location.href = '#'
-			return
-		}
 
 		let form = document.querySelector('app-form')
 		if (form) {
@@ -431,18 +414,18 @@ document.addEventListener('DOMContentLoaded', () => new class {
 				el.init_data({
 					fonts: fonts,
 					palette: palette,
-					width: 160,
-					height: 19,
+					width: 10,
+					height: 10,
 				})
 			else if (i == 2)
 				el.init_data({
 					fonts: fonts,
 					palette: palette,
-					width: 128,
-					height: 19,
+					width: 120,
+					height: 20,
 				})
 			else
-				el.init_data({ palette: palette, fonts: fonts, width: 96, height: 19 })
+				el.init_data({ palette: palette, fonts: fonts, width: 120, height: 20 })
 
 		})
 
@@ -536,7 +519,7 @@ document.addEventListener('DOMContentLoaded', () => new class {
 		let template = (w, h, c) => `
 			<form class="page letter_form">
 				<input type="text" name="char" value="${c.char}" onchange="this.form.onsubmit()" maxlength="1" autocomplete="off">
-				<led-canvas data='${JSON.stringify({width:w,height:h,pixels:c.pixels,enable_click_draw:true})}' onchange="this.form.onsubmit()"></led-canvas>
+				<led-canvas data='${JSON.stringify({ width: w, height: h, pixels: c.pixels, enable_click_draw: true })}' onchange="this.form.onsubmit()"></led-canvas>
 			</form>
 		`
 

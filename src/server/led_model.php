@@ -111,6 +111,10 @@ class led_model
         $this->db->query($sql);
     }
 
+    function get_panel_data($data)
+    {
+    }
+
     function delete_panel_data($destination_id)
     {
         if (empty($destination_id)) return false;

@@ -4,6 +4,12 @@ class router
 {
     //==Routes
 
+    function panel_data()
+    {
+        $out = $this->led_model->get_panel_data($this->post_data);
+        json_output($out);
+    }
+
     function projects_list()
     {
         $out = $this->led_model->projects_list();
@@ -115,8 +121,9 @@ class router
         }
 
         $this->db = new db_class();
-        $this->led_model = new led_model();
+
         $this->db->connect("localhost", "root", "asdasd", "led_panel");
+        $this->led_model = new led_model();
     }
 
     function __construct()
