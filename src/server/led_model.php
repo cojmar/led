@@ -89,6 +89,7 @@ class led_model
     function add_edit_panel($data)
     {
         if (empty($data)) return false;
+        if (empty($data['data'])) $data['data'] = '{}';
         $sql = $this->array_to_insert_update_sql($data, 'led_panels');
         $this->db->query($sql);
     }
